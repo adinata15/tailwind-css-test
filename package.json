@@ -5,10 +5,13 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:css": "sass --watch src/styles/main.scss src/styles/css-output/style.css ",
+    "start": "run-p build:css serve"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "npm-run-all": "^4.1.5",
     "vue": "^3.0.0"
   },
   "devDependencies": {
@@ -17,26 +20,91 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0-0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
+    "csso-loader": "^0.3.1",
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^7.0.0-0",
+    "mini-css-extract-plugin": "^1.3.3",
+    "postcss": "^8.2.2",
+    "postcss-loader": "^4.1.0",
+    "prettier": "^2.2.1",
+    "prettier-stylelint": "^0.4.2",
+    "purgecss-webpack-plugin": "^3.1.3",
+    "stylelint": "^13.8.0",
+    "stylelint-webpack-plugin": "^2.1.1"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "prettier": {
+    "trailingComma": "es5",
+    "useTabs": false,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "printWidth": 80,
+    "endOfLine": "auto"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "browser": true,
+      "commonjs": true,
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "google",
+      "plugin:prettier/recommended",
+      "plugin:vue/recommended",
+      "eslint:recommended"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "indent": [
+        "warn",
+        2
+      ],
+      "prettier/prettier": "warn",
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ],
+      "no-debugger": "warn",
+      "no-unused-vars": [
+        "warn",
+        {
+          "ignoreRestSiblings": true
+        }
+      ],
+      "no-plusplus": "off",
+      "no-undef": "off",
+      "no-var": "error",
+      "semi": [
+        "error",
+        "always"
+      ],
+      "no-param-reassign": [
+        "error",
+        {
+          "props": false
+        }
+      ]
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  }
 }

@@ -1,0 +1,28 @@
+{
+    "extends": [
+        "stylelint-config-idiomatic-order",
+        "./node_modules/prettier-stylelint/config.js"
+    ],
+    "rules": {
+        "comment-no-empty": true,
+        "comment-empty-line-before": [
+            "always",
+            {
+                "ignore": [
+                    "stylelint-commands",
+                    "after-comment"
+                ]
+            }
+        ],
+        "indentation": 2,
+        "max-empty-lines": 2,
+        "unit-allowed-list": [
+            "em",
+            "rem",
+            "%",
+            "px",
+            "vh",
+            "vw"
+        ]
+    }
+}
