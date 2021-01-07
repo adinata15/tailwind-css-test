@@ -2,8 +2,13 @@
   <div :style="tableStyle" class="cv-data-table">
     <div :class="`${carbonPrefix}--data-table-container`">
       <div v-if="hasTableHeader" :class="`${carbonPrefix}--data-table-header`">
-        <h4 :class="`${carbonPrefix}--data-table-header__title`" v-if="title">{{ title }}</h4>
-        <p v-if="isHelper" :class="`${carbonPrefix}--data-table-header__description`">
+        <h4 v-if="title" :class="`${carbonPrefix}--data-table-header__title`">
+          {{ title }}
+        </h4>
+        <p
+          v-if="isHelper"
+          :class="`${carbonPrefix}--data-table-header__description`"
+        >
           <slot name="helper-text">{{ helperText }}</slot>
         </p>
       </div>
@@ -11,19 +16,27 @@
       <section v-if="hasToolbar" :class="`${carbonPrefix}--table-toolbar`">
         <div
           v-show="hasBatchActions"
-          :class="[`${carbonPrefix}--batch-actions`, { [`${carbonPrefix}--batch-actions--active`]: batchActive }]"
+          :class="[
+            `${carbonPrefix}--batch-actions`,
+            { [`${carbonPrefix}--batch-actions--active`]: batchActive },
+          ]"
           :aria-label="actionBarAriaLabel"
         >
           <div :class="`${carbonPrefix}--action-list`">
             <slot name="batch-actions" />
-            <cv-button :class="`${carbonPrefix}--batch-summary__cancel`" size="small" @click="deselect">{{
-              batchCancelLabel
-            }}</cv-button>
+            <cv-button
+              :class="`${carbonPrefix}--batch-summary__cancel`"
+              size="small"
+              @click="deselect"
+              >{{ batchCancelLabel }}</cv-button
+            >
           </div>
           <div :class="`${carbonPrefix}--batch-summary`">
             <p :class="`${carbonPrefix}--batch-summary__para`">
               <span data-items-selected>
-                <slot name="items-selected" v-bind:scope="{ count: dataRowsSelected.length }"
+                <slot
+                  name="items-selected"
+                  :scope="{ count: dataRowsSelected.length }"
                   >{{ dataRowsSelected.length }} items selected</slot
                 >
               </span>
@@ -34,47 +47,56 @@
         <div :class="`${carbonPrefix}--toolbar-content`">
           <div
             v-if="$listeners.search"
+            ref="searchContainer"
             :class="{
-              [`${carbonPrefix}--toolbar-search-container-active`]: searchActive || searchValue.length > 0,
+              [`${carbonPrefix}--toolbar-search-container-active`]:
+                searchActive || searchValue.length > 0,
               [`${carbonPrefix}--toolbar-search-container-persistent`]: !expandingSearch,
               [`${carbonPrefix}--toolbar-search-container-expandable`]: expandingSearch,
             }"
-            ref="searchContainer"
           >
-            <div data-search :class="`${carbonPrefix}--search ${carbonPrefix}--search--sm`" role="search">
+            <div
+              data-search
+              :class="`${carbonPrefix}--search ${carbonPrefix}--search--sm`"
+              role="search"
+            >
               <div
+                ref="magnifier"
                 :class="`${carbonPrefix}--search-magnifier`"
                 tabindex="0"
                 @click="checkSearchExpand(true)"
                 @keydown.enter.prevent="checkSearchExpand(true)"
                 @keydown.space.prevent
                 @keyup.space.prevent="checkSearchExpand(true)"
-                ref="magnifier"
               >
                 <Search16 :class="`${carbonPrefix}--toolbar-action__icon`" />
               </div>
-              <label :for="uid" :class="`${carbonPrefix}--label`">{{ searchLabel }}</label>
+              <label :for="uid" :class="`${carbonPrefix}--label`">{{
+                searchLabel
+              }}</label>
               <input
+                :id="uid"
+                ref="search"
+                v-model="searchValue"
                 :class="`${carbonPrefix}--search-input`"
                 type="text"
-                :id="uid"
                 role="search"
                 :placeholder="searchPlaceholder"
                 :aria-labelledby="uid"
-                ref="search"
-                v-model="searchValue"
                 @input="onSearch"
                 @keydown.esc.prevent="checkSearchExpand(false)"
               />
               <button
                 :class="[
                   `${carbonPrefix}--search-close`,
-                  { [`${carbonPrefix}--search-close--hidden`]: !clearSearchVisible },
+                  {
+                    [`${carbonPrefix}--search-close--hidden`]: !clearSearchVisible,
+                  },
                 ]"
                 :title="searchClearLabel"
                 :aria-label="searchClearLabel"
-                @click="onClearClick"
                 type="button"
+                @click="onClearClick"
               >
                 <Close16 />
               </button>
@@ -88,7 +110,9 @@
         :class="[
           `${carbonPrefix}--data-table`,
           {
-            [`${carbonPrefix}--data-table--${rowSize} `]: !(rowSize.length === 0 || rowSize === 'standard'),
+            [`${carbonPrefix}--data-table--${rowSize} `]: !(
+              rowSize.length === 0 || rowSize === 'standard'
+            ),
             [`${carbonPrefix}--data-table--zebra `]: zebra,
             [`${carbonPrefix}--data-table--no-border `]: borderless,
             [`${carbonPrefix}--skeleton `]: skeleton,
@@ -106,21 +130,26 @@
               <button
                 v-if="hasExpandAll"
                 :class="`${carbonPrefix}--table-expand__button`"
-                @click="toggleExpandAll"
                 type="button"
-                :aria-label="dataExpandAll ? collapseAllAriaLabel : expandAllAriaLabel"
+                :aria-label="
+                  dataExpandAll ? collapseAllAriaLabel : expandAllAriaLabel
+                "
+                @click="toggleExpandAll"
               >
                 <ChevronRight16 :class="`${carbonPrefix}--table-expand__svg`" />
               </button>
             </th>
-            <th v-if="hasBatchActions" :class="`${carbonPrefix}--table-column-checkbox`">
+            <th
+              v-if="hasBatchActions"
+              :class="`${carbonPrefix}--table-column-checkbox`"
+            >
               <cv-checkbox
+                v-model="headingChecked"
                 :form-item="false"
                 value="headingCheck"
-                v-model="headingChecked"
-                @change="onHeadingCheckChange"
                 :label="selectAllAriaLabel"
-                hideLabel
+                hide-label
+                @change="onHeadingCheckChange"
               />
             </th>
             <slot name="headings">
@@ -143,8 +172,8 @@
             <cv-data-table-row
               v-for="(row, rowIndex) in data"
               :key="`row:${rowIndex}`"
-              :value="`${rowIndex}`"
               ref="dataRows"
+              :value="`${rowIndex}`"
               :overflow-menu="overflowMenu"
             >
               <cv-data-table-cell
@@ -152,7 +181,9 @@
                 :key="`cell:${colIndex}:${rowIndex}`"
                 :style="dataStyle(colIndex)"
               >
-                <cv-wrapper :tag-type="skeleton ? 'span' : ''">{{ cell }}</cv-wrapper>
+                <cv-wrapper :tag-type="skeleton ? 'span' : ''">{{
+                  cell
+                }}</cv-wrapper>
               </cv-data-table-cell>
             </cv-data-table-row>
           </slot>
@@ -166,12 +197,20 @@
       :actual-items-on-page="this.registeredRows.length"
       @change="$emit('pagination', $event)"
     >
-      <template v-slot:range-text="{ scope }">
-        <slot name="range-text" v-bind:scope="scope" v-if="$scopedSlots['range-text']" />
+      <template #range-text="{ scope }">
+        <slot
+          v-if="$scopedSlots['range-text']"
+          name="range-text"
+          :scope="scope"
+        />
       </template>
 
-      <template v-slot:of-n-pages="{ scope }">
-        <slot name="of-n-pages" v-bind:scope="scope" v-if="$scopedSlots['of-n-pages']"></slot>
+      <template #of-n-pages="{ scope }">
+        <slot
+          v-if="$scopedSlots['of-n-pages']"
+          name="of-n-pages"
+          :scope="scope"
+        ></slot>
       </template>
     </cv-pagination>
   </div>
@@ -204,6 +243,10 @@ export default {
     ChevronRight16,
   },
   mixins: [uidMixin, carbonPrefixMixin],
+  model: {
+    prop: 'rows-selected',
+    event: 'row-select-changes',
+  },
   props: {
     actionBarAriaLabel: { type: String, default: 'Table Action Bar' },
     collapseAllAriaLabel: { type: String, default: 'Collapse all rows' },
@@ -220,7 +263,8 @@ export default {
     rowSize: {
       type: String,
       default: 'standard',
-      validator: val => ['compact', 'short', 'standard', 'tall', ''].includes(val),
+      validator: (val) =>
+        ['compact', 'short', 'standard', 'tall', ''].includes(val),
     },
     searchLabel: { type: String, default: 'Search' },
     searchPlaceholder: { type: String, default: 'Search' },
@@ -235,10 +279,6 @@ export default {
     expandingSearch: { type: Boolean, default: true },
     skeleton: Boolean,
     hasExpandAll: Boolean,
-  },
-  model: {
-    prop: 'rows-selected',
-    event: 'row-select-changes',
   },
   data() {
     return {
@@ -257,37 +297,9 @@ export default {
       dataExpandAll: false,
     };
   },
-  watch: {
-    rowsSelected() {
-      this.updateRowsSelected();
-    },
-  },
-  created() {
-    // add these on created otherwise cv:mounted is too late.
-    this.$on('cv:mounted', srcComponent => this.onCvMount(srcComponent));
-    this.$on('cv:beforeDestroy', srcComponent => this.onCvBeforeDestroy(srcComponent));
-    this.$on('cv:sort', (srcComponent, value) => this.onSort(srcComponent, value));
-  },
-  mounted() {
-    if (this.$refs.searchContainer) {
-      this.$refs.magnifier.addEventListener('blur', this.checkSearchFocus);
-      this.$refs.search.addEventListener('blur', this.checkSearchFocus);
-    }
-    this.updateRowsSelected();
-    this.checkSlots();
-  },
-  beforeDestroy() {
-    if (this.$refs.searchContainer) {
-      this.$refs.magnifier.removeEventListener('blur', this.checkSearchFocus);
-      this.$refs.search.removeEventListener('blur', this.checkSearchFocus);
-    }
-  },
-  updated() {
-    this.checkSlots();
-  },
   computed: {
     columnHeading() {
-      return col => {
+      return (col) => {
         if (typeof col === 'object') {
           return col.label || '';
         } else {
@@ -297,10 +309,13 @@ export default {
     },
     isSortable() {
       // is any column sortable
-      return this.sortable || this.registeredHeadings.some(column => column.sortable);
+      return (
+        this.sortable ||
+        this.registeredHeadings.some((column) => column.sortable)
+      );
     },
     isColSortable() {
-      return col => {
+      return (col) => {
         // is specific column or all sortable
         return (col && col.sortable) || this.sortable;
       };
@@ -310,13 +325,18 @@ export default {
     },
 
     hasExpandables() {
-      return this.registeredRows.some(item => item.expandable);
+      return this.registeredRows.some((item) => item.expandable);
     },
     hasOverflowMenu() {
-      return this.overflowMenu === true || (this.overflowMenu && this.overflowMenu.length > 0);
+      return (
+        this.overflowMenu === true ||
+        (this.overflowMenu && this.overflowMenu.length > 0)
+      );
     },
     tableStyle() {
-      return this.autoWidth ? { width: 'initial', display: 'inline-block' } : { width: '100%' };
+      return this.autoWidth
+        ? { width: 'initial', display: 'inline-block' }
+        : { width: '100%' };
     },
     internalPagination() {
       if (typeof this.pagination === 'object') {
@@ -336,28 +356,76 @@ export default {
       }
     },
     headingStyle() {
-      return col => (typeof col === 'object' ? col.headingStyle : {});
+      return (col) => (typeof col === 'object' ? col.headingStyle : {});
     },
     dataStyle() {
-      return index => (this.columns && this.columns[index] && this.columns[index].dataStyle) || {};
+      return (index) =>
+        (this.columns &&
+          this.columns[index] &&
+          this.columns[index].dataStyle) ||
+        {};
     },
     selectedRows() {
       return this.dataRowsSelected;
     },
+  },
+  watch: {
+    rowsSelected() {
+      this.updateRowsSelected();
+    },
+  },
+  created() {
+    // add these on created otherwise cv:mounted is too late.
+    this.$on('cv:mounted', (srcComponent) => this.onCvMount(srcComponent));
+    this.$on('cv:beforeDestroy', (srcComponent) =>
+      this.onCvBeforeDestroy(srcComponent)
+    );
+    this.$on('cv:sort', (srcComponent, value) =>
+      this.onSort(srcComponent, value)
+    );
+  },
+  mounted() {
+    if (this.$refs.searchContainer) {
+      this.$refs.magnifier.addEventListener('blur', this.checkSearchFocus);
+      this.$refs.search.addEventListener('blur', this.checkSearchFocus);
+    }
+    this.updateRowsSelected();
+    this.checkSlots();
+  },
+  beforeDestroy() {
+    if (this.$refs.searchContainer) {
+      this.$refs.magnifier.removeEventListener('blur', this.checkSearchFocus);
+      this.$refs.search.removeEventListener('blur', this.checkSearchFocus);
+    }
+  },
+  updated() {
+    this.checkSlots();
   },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
       this.hasBatchActions = !!this.$slots['batch-actions'];
       this.hasActions = !!this.$slots.actions;
-      this.hasToolbar = !!(this.$slots.actions || this.$listeners.search || this.$slots['batch-actions']);
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.hasToolbar = !!(
+        this.$slots.actions ||
+        this.$listeners.search ||
+        this.$slots['batch-actions']
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
     onCvMount(thing) {
       if (thing.$_CvDataTableHeading) {
-        this.registeredHeadings = this.$children.filter(item => item.$_CvDataTableHeading);
+        this.registeredHeadings = this.$children.filter(
+          (item) => item.$_CvDataTableHeading
+        );
         const heading = thing;
-        if (this.registeredHeadings.filter(item => item.uid === heading.uid).length > 1) {
+        if (
+          this.registeredHeadings.filter((item) => item.uid === heading.uid)
+            .length > 1
+        ) {
           console.error(
             `CvDataTable: Duplicate ID specified for CvDataTableHeading, this may cause issues. {id: ${heading.id}}`
           );
@@ -365,7 +433,9 @@ export default {
       } else {
         const row = thing;
         this.registeredRows.push(row);
-        if (this.registeredRows.filter(item => item.uid === row.uid).length > 1) {
+        if (
+          this.registeredRows.filter((item) => item.uid === row.uid).length > 1
+        ) {
           console.error(
             `CvDataTable: Duplicate ID specified for CvDataTableRow, this may cause issues. {id: ${row.id}, value: ${row.value}}`
           );
@@ -376,10 +446,14 @@ export default {
     },
     onCvBeforeDestroy(thing) {
       if (thing.$_CvDataTableHeading) {
-        this.registeredHeadings = this.$children.filter(item => item.$_CvDataTableHeading);
+        this.registeredHeadings = this.$children.filter(
+          (item) => item.$_CvDataTableHeading
+        );
       } else {
         const row = thing;
-        const index = this.registeredRows.findIndex(item => row.uid === item.uid);
+        const index = this.registeredRows.findIndex(
+          (item) => row.uid === item.uid
+        );
         this.registeredRows.splice(index, 1);
         this.updateSomeExpandingRows();
       }
@@ -408,7 +482,7 @@ export default {
     updateRowsSelected() {
       this.dataRowsSelected = [];
       for (const i in this.registeredRows) {
-        let child = this.registeredRows[i];
+        const child = this.registeredRows[i];
         if (child.isCvDataTableRow) {
           child.isChecked = this.rowsSelected.includes(child.value);
 
@@ -418,7 +492,8 @@ export default {
         }
       }
       this.headingChecked =
-        this.dataRowsSelected.length === this.registeredRows.filter(item => item.isCvDataTableRow).length;
+        this.dataRowsSelected.length ===
+        this.registeredRows.filter((item) => item.isCvDataTableRow).length;
       this.batchActive = this.dataRowsSelected.length > 0;
     },
     onClearClick() {
@@ -454,7 +529,7 @@ export default {
       this.onHeadingCheckChange();
     },
     onRowCheckChange(value, checked) {
-      let modelSet = new Set(this.dataRowsSelected);
+      const modelSet = new Set(this.dataRowsSelected);
 
       if (!checked) {
         modelSet.delete(value);
@@ -462,7 +537,8 @@ export default {
         modelSet.add(value);
       }
       this.dataRowsSelected = Array.from(modelSet);
-      this.headingChecked = this.dataRowsSelected.length === this.registeredRows.length;
+      this.headingChecked =
+        this.dataRowsSelected.length === this.registeredRows.length;
       this.batchActive = this.dataRowsSelected.length > 0;
 
       this.$emit('row-select-change', { value, selected: checked });
@@ -477,7 +553,7 @@ export default {
     },
     onSort(srcComponent, val) {
       let index;
-      for (let colIndex in this.registeredHeadings) {
+      for (const colIndex in this.registeredHeadings) {
         const column = this.registeredHeadings[colIndex];
         if (column.uid === srcComponent.uid) {
           column.internalOrder = val;
@@ -502,7 +578,9 @@ export default {
     onCvExpandedChange(row) {
       if (row.isExpanded) {
         // are all rows expanded
-        this.dataExpandAll = this.registeredRows.every(item => item.isExpanded);
+        this.dataExpandAll = this.registeredRows.every(
+          (item) => item.isExpanded
+        );
       } else {
         this.dataExpandAll = false;
       }

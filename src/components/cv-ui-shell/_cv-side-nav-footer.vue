@@ -4,8 +4,8 @@
       :class="`${carbonPrefix}--side-nav__toggle`"
       type="button"
       v-bind="$attrs"
-      @click="$emit('toggle-expand')"
       :title="assistiveText"
+      @click="$emit('toggle-expand')"
     >
       <div :class="`${carbonPrefix}--side-nav__icon`">
         <Close20
@@ -17,7 +17,9 @@
           :class="`${carbonPrefix}--side-nav__icon--expand ${carbonPrefix}--side-nave-expand-icon`"
         />
       </div>
-      <span :class="`${carbonPrefix}--assistive-text`">{{ assistiveText }}</span>
+      <span :class="`${carbonPrefix}--assistive-text`">{{
+        assistiveText
+      }}</span>
     </button>
   </footer>
 </template>
@@ -29,9 +31,9 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvSideNavFooter',
-  inheritAttrs: false,
-  mixins: [carbonPrefixMixin],
   components: { ChevronRight20, Close20 },
+  mixins: [carbonPrefixMixin],
+  inheritAttrs: false,
   props: {
     assistiveText: { type: String, default: 'Open / close side nav' },
     expanded: Boolean,

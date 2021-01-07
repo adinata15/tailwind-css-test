@@ -3,7 +3,10 @@
     :class="[
       `cv-side-nav-menu`,
       `${carbonPrefix}--side-nav__item`,
-      { [`${carbonPrefix}--side-nav__item--active`]: active, [`${carbonPrefix}--side-nav__item--icon`]: hasIcon },
+      {
+        [`${carbonPrefix}--side-nav__item--active`]: active,
+        [`${carbonPrefix}--side-nav__item--icon`]: hasIcon,
+      },
     ]"
   >
     <button
@@ -20,7 +23,9 @@
       <cv-side-nav-icon v-if="hasIcon">
         <slot name="nav-icon" />
       </cv-side-nav-icon>
-      <span :class="`${carbonPrefix}--side-nav__submenu-title`">{{ title }}</span>
+      <span :class="`${carbonPrefix}--side-nav__submenu-title`">{{
+        title
+      }}</span>
       <cv-side-nav-icon
         :class="`${carbonPrefix}--side-nav__submenu-chevron`"
         small
@@ -29,7 +34,7 @@
         <ChevronDown20 class="cv-side-nav-menu__chevron-svg" />
       </cv-side-nav-icon>
     </button>
-    <ul :class="`${carbonPrefix}--side-nav__menu`" ref="menu">
+    <ul ref="menu" :class="`${carbonPrefix}--side-nav__menu`">
       <slot></slot>
     </ul>
   </li>
@@ -42,8 +47,8 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvSideNavMenu',
-  mixins: [carbonPrefixMixin],
   components: { CvSideNavIcon, ChevronDown20 },
+  mixins: [carbonPrefixMixin],
   props: {
     active: Boolean,
     title: { type: String, required: true },
@@ -55,21 +60,9 @@ export default {
       hasNavIcon: false,
     };
   },
-  mounted() {
-    // NOTE: this.$slots is not reactive so needs to be managed on updated
-    this.hasNavIcon = !!this.$slots['nav-icon'];
-  },
-  updated() {
-    this.hasNavIcon = !!this.$slots['nav-icon'];
-  },
   computed: {
     hasIcon() {
       return !!this.$slots['nav-icon'];
-    },
-  },
-  methods: {
-    doToggle() {
-      this.isExpanded = !this.isExpanded;
     },
   },
   watch: {
@@ -78,6 +71,18 @@ export default {
       handler(value) {
         this.isExpanded = value;
       },
+    },
+  },
+  mounted() {
+    // NOTE: this.$slots is not reactive so needs to be managed on updated
+    this.hasNavIcon = !!this.$slots['nav-icon'];
+  },
+  updated() {
+    this.hasNavIcon = !!this.$slots['nav-icon'];
+  },
+  methods: {
+    doToggle() {
+      this.isExpanded = !this.isExpanded;
     },
   },
 };

@@ -12,6 +12,7 @@
 
 <template>
   <button
+    :id="uid"
     type="button"
     role="tab"
     class="cv-content-switcher-button"
@@ -23,10 +24,15 @@
     ]"
     :data-target="contentSelector"
     :aria-selected="dataSelected ? 'true' : 'false'"
-    :id="uid"
     @click="open"
   >
-    <CvSvg v-if="icon" :svg="icon" :class="`${carbonPrefix}--content-switcher__icon`" height="16" width="16" />
+    <CvSvg
+      v-if="icon"
+      :svg="icon"
+      :class="`${carbonPrefix}--content-switcher__icon`"
+      height="16"
+      width="16"
+    />
     <span :class="`${carbonPrefix}--content-switcher__label`">
       <slot></slot>
     </span>
@@ -39,8 +45,8 @@ import CvSvg from '../cv-svg/_cv-svg';
 
 export default {
   name: 'CvContentSwitcherButton',
-  mixins: [uidMixin, carbonPrefixMixin],
   components: { CvSvg },
+  mixins: [uidMixin, carbonPrefixMixin],
   props: {
     contentSelector: { type: String, default: undefined },
     icon: {
@@ -56,6 +62,19 @@ export default {
     ownerId: { type: String, default: undefined },
     selected: Boolean,
   },
+  data() {
+    return {
+      dataSelected: false,
+    };
+  },
+  computed: {
+    buttonId() {
+      return this.uid;
+    },
+    isSelected() {
+      return this.dataSelected;
+    },
+  },
   watch: {
     selected(val) {
       if (val) {
@@ -65,16 +84,13 @@ export default {
       }
     },
   },
-  data() {
-    return {
-      dataSelected: false,
-    };
-  },
   mounted() {
     this.$_CvContentSwitcherButton = true; // for use by parent with $children
 
     if (this.contentSelector === '' && this.ownerId === '') {
-      console.error('CvContentSwitcherButton: ownerId or content-selector properties must not be empty strings.');
+      console.error(
+        'CvContentSwitcherButton: ownerId or content-selector properties must not be empty strings.'
+      );
     }
 
     this.dataSelected = this.selected;
@@ -82,14 +98,6 @@ export default {
   },
   beforeDestroy() {
     this.$parent.$emit('cv:beforeDestroy', this);
-  },
-  computed: {
-    buttonId() {
-      return this.uid;
-    },
-    isSelected() {
-      return this.dataSelected;
-    },
   },
   methods: {
     close() {

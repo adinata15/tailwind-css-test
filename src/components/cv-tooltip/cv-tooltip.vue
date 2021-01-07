@@ -22,10 +22,14 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvTooltip',
-  mixins: [carbonPrefixMixin],
   components: { Information16 },
+  mixins: [carbonPrefixMixin],
   props: {
-    alignment: { type: String, default: 'center', validator: val => ['start', 'center', 'end'].includes(val) },
+    alignment: {
+      type: String,
+      default: 'center',
+      validator: (val) => ['start', 'center', 'end'].includes(val),
+    },
     direction: {
       type: String,
       default: 'top',
@@ -33,7 +37,9 @@ export default {
         const validValues = ['top', 'left', 'right', 'bottom'];
         const valid = validValues.includes(val);
         if (!valid) {
-          console.warn(`CVTooltip.direction must be one of the following: ${validValues}`);
+          console.warn(
+            `CVTooltip.direction must be one of the following: ${validValues}`
+          );
         }
         return valid;
       },

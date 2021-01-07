@@ -5,15 +5,24 @@
       :class="[
         `${carbonPrefix}--label`,
         {
-          [`${carbonPrefix}--label--disabled`]: $attrs.disabled !== undefined && $attrs.disabled,
+          [`${carbonPrefix}--label--disabled`]:
+            $attrs.disabled !== undefined && $attrs.disabled,
         },
       ]"
       >{{ label }}</label
     >
-    <div :class="`${carbonPrefix}--text-area__wrapper`" :data-invalid="isInvalid">
-      <WarningFilled16 v-if="isInvalid" :class="`${carbonPrefix}--text-area__invalid-icon`" />
+    <div
+      :class="`${carbonPrefix}--text-area__wrapper`"
+      :data-invalid="isInvalid"
+    >
+      <WarningFilled16
+        v-if="isInvalid"
+        :class="`${carbonPrefix}--text-area__invalid-icon`"
+      />
       <textarea
         :id="uid"
+        v-bind="$attrs"
+        ref="textarea"
         :class="[
           `${carbonPrefix}--text-area`,
           {
@@ -21,13 +30,11 @@
             [`${carbonPrefix}--text-area--invalid`]: isInvalid,
           },
         ]"
-        v-bind="$attrs"
         :value="value"
         v-on="inputListeners"
-        ref="textarea"
       ></textarea>
     </div>
-    <div :class="`${carbonPrefix}--form-requirement`" v-if="isInvalid">
+    <div v-if="isInvalid" :class="`${carbonPrefix}--form-requirement`">
       <slot name="invalid-message">{{ invalidMessage }}</slot>
     </div>
     <div
@@ -43,12 +50,22 @@
 </template>
 
 <script>
-import { uidMixin, themeMixin, methodsMixin, carbonPrefixMixin } from '../../mixins';
+import {
+  uidMixin,
+  themeMixin,
+  methodsMixin,
+  carbonPrefixMixin,
+} from '../../mixins';
 import WarningFilled16 from '@carbon/icons-vue/es/warning--filled/16';
 
 export default {
   name: 'CvTextArea',
-  mixins: [uidMixin, themeMixin, carbonPrefixMixin, methodsMixin({ textarea: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    themeMixin,
+    carbonPrefixMixin,
+    methodsMixin({ textarea: ['blur', 'focus'] }),
+  ],
   inheritAttrs: false,
   components: { WarningFilled16 },
   props: {
@@ -63,12 +80,6 @@ export default {
       isInvalid: false,
     };
   },
-  mounted() {
-    this.checkSlots();
-  },
-  updated() {
-    this.checkSlots();
-  },
   computed: {
     // Bind listeners at the component level to the embedded input element and
     // add our own input listener to service the v-model. See:
@@ -76,15 +87,27 @@ export default {
     inputListeners() {
       return {
         ...this.$listeners,
-        input: event => this.$emit('input', event.target.value),
+        input: (event) => this.$emit('input', event.target.value),
       };
     },
+  },
+  mounted() {
+    this.checkSlots();
+  },
+  updated() {
+    this.checkSlots();
   },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.isInvalid = !!(this.$slots['invalid-message'] || (this.invalidMessage && this.invalidMessage.length));
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.isInvalid = !!(
+        this.$slots['invalid-message'] ||
+        (this.invalidMessage && this.invalidMessage.length)
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
   },
 };

@@ -1,6 +1,11 @@
 <template>
-  <cv-wrapper :tag-type="overlay ? 'div' : ''" class="cv-loading" :class="overlayClasses">
+  <cv-wrapper
+    :tag-type="overlay ? 'div' : ''"
+    class="cv-loading"
+    :class="overlayClasses"
+  >
     <div
+      ref="loading"
       data-loading
       :class="{
         'cv-loading': !overlay,
@@ -8,15 +13,25 @@
         [`${carbonPrefix}--loading--stop`]: !active && stopping,
         [`${carbonPrefix}--loading--small`]: small,
       }"
-      ref="loading"
     >
       <label :class="`${carbonPrefix}--visually-hidden`">
         {{ description }}
       </label>
       <svg :class="`${carbonPrefix}--loading__svg`" viewBox="-75 -75 150 150">
         <title>{{ description }}</title>
-        <circle v-if="small" :class="`${carbonPrefix}--loading__background`" cx="0" cy="0" :r="loadingRadius" />
-        <circle :class="`${carbonPrefix}--loading__stroke`" cx="0" cy="0" :r="loadingRadius" />
+        <circle
+          v-if="small"
+          :class="`${carbonPrefix}--loading__background`"
+          cx="0"
+          cy="0"
+          :r="loadingRadius"
+        />
+        <circle
+          :class="`${carbonPrefix}--loading__stroke`"
+          cx="0"
+          cy="0"
+          :r="loadingRadius"
+        />
       </svg>
     </div>
   </cv-wrapper>
@@ -28,13 +43,18 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvLoading',
-  mixins: [carbonPrefixMixin],
   components: { CvWrapper },
+  mixins: [carbonPrefixMixin],
   props: {
     active: { type: Boolean, default: true },
     description: { type: String, default: 'Loading' },
     overlay: Boolean,
     small: Boolean,
+  },
+  data() {
+    return {
+      stopping: false,
+    };
   },
   computed: {
     overlayClasses() {
@@ -52,11 +72,6 @@ export default {
     loadingRadius() {
       return this.small ? '26.8125' : '37.5';
     },
-  },
-  data() {
-    return {
-      stopping: false,
-    };
   },
   watch: {
     active(val) {

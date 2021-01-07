@@ -1,11 +1,14 @@
 <template>
-  <div class="cv-tabs" ref="tabs" style="width: 100%;">
+  <div ref="tabs" class="cv-tabs" style="width: 100%">
     <div
       data-tabs
-      :class="[`cv-tab ${carbonPrefix}--tabs`, { [`${carbonPrefix}--tabs--container`]: container }]"
+      :class="[
+        `cv-tab ${carbonPrefix}--tabs`,
+        { [`${carbonPrefix}--tabs--container`]: container },
+      ]"
       role="navigation"
-      v-on="$listeners"
       v-bind="$attrs"
+      v-on="$listeners"
       @keydown.right.prevent="onRight"
       @keydown.left.prevent="onLeft"
       @keydown.down.prevent="onDown"
@@ -13,26 +16,41 @@
       @keydown.esc.prevent="onEsc"
     >
       <div
-        :class="[`${carbonPrefix}--tabs-trigger`, { ' ${carbonPrefix}--tabs-trigger--open': open }]"
-        tabindex="0"
         ref="trigger"
+        :class="[
+          `${carbonPrefix}--tabs-trigger`,
+          { ' ${carbonPrefix}--tabs-trigger--open': open },
+        ]"
+        tabindex="0"
         @click="onClick"
         @keydown.enter.prevent="onClick"
       >
-        <a href="javascript:void(0)" :class="`${carbonPrefix}--tabs-trigger-text`" tabindex="-1">
+        <a
+          href="javascript:void(0)"
+          :class="`${carbonPrefix}--tabs-trigger-text`"
+          tabindex="-1"
+        >
           {{ currentTabLabel }}
         </a>
         <chevron-down-glyph />
       </div>
-      <ul :class="[`${carbonPrefix}--tabs__nav`, { [`${carbonPrefix}--tabs__nav--hidden`]: !open }]" role="tablist">
+      <ul
+        :class="[
+          `${carbonPrefix}--tabs__nav`,
+          { [`${carbonPrefix}--tabs__nav--hidden`]: !open },
+        ]"
+        role="tablist"
+      >
         <li
           v-for="tab in tabs"
           :key="tab.uid"
           :class="[
             `cv-tabs-button  ${carbonPrefix}--tabs__nav-item`,
             {
-              [`${carbonPrefix}--tabs__nav-item--selected`]: selectedId == tab.uid,
-              [`${carbonPrefix}--tabs__nav-item--disabled`]: disabledTabs.indexOf(tab.uid) !== -1,
+              [`${carbonPrefix}--tabs__nav-item--selected`]:
+                selectedId == tab.uid,
+              [`${carbonPrefix}--tabs__nav-item--disabled`]:
+                disabledTabs.indexOf(tab.uid) !== -1,
             },
           ]"
           role="tab"
@@ -40,14 +58,14 @@
           :aria-disabled="disabledTabs.indexOf(tab.uid) !== -1"
         >
           <a
+            :id="`${tab.uid}-link`"
+            ref="link"
             :class="`${carbonPrefix}--tabs__nav-link`"
             href="javascript:void(0)"
             role="tab"
             :aria-controls="tab.uid"
-            :id="`${tab.uid}-link`"
             @click="onTabClick(tab.uid)"
             @keydown.enter.prevent="onTabEnter(tab.uid)"
-            ref="link"
             >{{ tab.label }}</a
           >
         </li>
@@ -65,12 +83,12 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvTabs',
+  components: { ChevronDownGlyph },
   mixins: [carbonPrefixMixin],
   props: {
     noDefaultToFirst: Boolean,
     container: Boolean,
   },
-  components: { ChevronDownGlyph },
   data() {
     return {
       tabs: [],
@@ -81,13 +99,26 @@ export default {
       // data is open
     };
   },
+  computed: {
+    triggerStyleOverride() {
+      // <style carbon tweaks - DO NOT USE STYLE TAG as it causes SSR issues
+      return { padding: 0 };
+    },
+    currentTabLabel() {
+      const index = this.tabs.findIndex((tab) => tab.uid === this.selectedId);
+
+      return index > -1 ? this.tabs[index].label : '';
+    },
+  },
   created() {
     // add these on created otherwise cv:mounted is too early.
-    this.$on('cv:mounted', srcComponent => this.onCvMount(srcComponent));
-    this.$on('cv:beforeDestroy', srcComponent => this.onCvBeforeDestroy(srcComponent));
-    this.$on('cv:selected', srcComponent => this.onCvSelected(srcComponent));
-    this.$on('cv:disabled', srcComponent => this.onCvDisabled(srcComponent));
-    this.$on('cv:enabled', srcComponent => this.onCvEnabled(srcComponent));
+    this.$on('cv:mounted', (srcComponent) => this.onCvMount(srcComponent));
+    this.$on('cv:beforeDestroy', (srcComponent) =>
+      this.onCvBeforeDestroy(srcComponent)
+    );
+    this.$on('cv:selected', (srcComponent) => this.onCvSelected(srcComponent));
+    this.$on('cv:disabled', (srcComponent) => this.onCvDisabled(srcComponent));
+    this.$on('cv:enabled', (srcComponent) => this.onCvEnabled(srcComponent));
   },
   mounted() {
     this.$refs.tabs.addEventListener('focusout', this.onFocusout);
@@ -97,17 +128,6 @@ export default {
     this.$refs.tabs.removeEventListener('focusout', this.onFocusout);
     this.$refs.tabs.removeEventListener('focusin', this.onFocusin);
   },
-  computed: {
-    triggerStyleOverride() {
-      // <style carbon tweaks - DO NOT USE STYLE TAG as it causes SSR issues
-      return { padding: 0 };
-    },
-    currentTabLabel() {
-      const index = this.tabs.findIndex(tab => tab.uid === this.selectedId);
-
-      return index > -1 ? this.tabs[index].label : '';
-    },
-  },
   methods: {
     onFocusin(ev) {
       if (
@@ -115,18 +135,26 @@ export default {
         ev.target.classList.contains(`${this.carbonPrefix}--tabs-trigger`)
       ) {
         // record display prop state
-        this.lastDisplayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+        this.lastDisplayProp = window
+          .getComputedStyle(this.$refs.trigger)
+          .getPropertyValue('display');
       } else {
         this.lastDisplayProp = undefined;
       }
     },
     onFocusout(ev) {
       // works with onFocusin to determine whether focus needs to be set to a tab or trigger
-      const displayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+      const displayProp = window
+        .getComputedStyle(this.$refs.trigger)
+        .getPropertyValue('display');
       if (ev.relatedTarget) {
         if (
-          ev.relatedTarget.classList.contains(`${this.carbonPrefix}--tabs__nav-link`) ||
-          ev.relatedTarget.classList.contains(`${this.carbonPrefix}--tabs-trigger`)
+          ev.relatedTarget.classList.contains(
+            `${this.carbonPrefix}--tabs__nav-link`
+          ) ||
+          ev.relatedTarget.classList.contains(
+            `${this.carbonPrefix}--tabs-trigger`
+          )
         ) {
           return; // no need to do anything - focus is going somewhere
         } else {
@@ -136,7 +164,9 @@ export default {
         if (this.lastDisplayProp && this.lastDisplayProp !== displayProp) {
           if (displayProp === 'none') {
             // focus on selected tab
-            const currentTabLink = this.$refs.link.find(link => link.getAttribute('aria-controls') === this.selectedId);
+            const currentTabLink = this.$refs.link.find(
+              (link) => link.getAttribute('aria-controls') === this.selectedId
+            );
             if (currentTabLink) {
               currentTabLink.focus();
             }
@@ -150,15 +180,22 @@ export default {
     },
     onWindowResize() {
       // check whether trigger is displayed
-      this.dataDropdownShown = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display') !== 'none';
+      this.dataDropdownShown =
+        window
+          .getComputedStyle(this.$refs.trigger)
+          .getPropertyValue('display') !== 'none';
     },
     onDropChange(val) {
       this.onTabClick(val);
     },
     onCvMount(srcComponent) {
       this.tabs.push(srcComponent);
-      if (this.tabs.filter(item => item.uid === srcComponent.uid).length > 1) {
-        console.error(`CvTabs: Duplicate ID specified for CvTab, this may cause issues. {id: ${srcComponent.id}}}`);
+      if (
+        this.tabs.filter((item) => item.uid === srcComponent.uid).length > 1
+      ) {
+        console.error(
+          `CvTabs: Duplicate ID specified for CvTab, this may cause issues. {id: ${srcComponent.id}}}`
+        );
       }
 
       this.checkDisabled(srcComponent);
@@ -171,7 +208,9 @@ export default {
       }
     },
     onCvBeforeDestroy(srcComponent) {
-      const tabIndex = this.tabs.findIndex(item => item.uid === srcComponent.uid);
+      const tabIndex = this.tabs.findIndex(
+        (item) => item.uid === srcComponent.uid
+      );
       if (tabIndex > -1) {
         const wasSelected = srcComponent.uid === this.selectedId;
 
@@ -217,7 +256,7 @@ export default {
       this.disabledTabs.push(srcComponent.uid);
     },
     onCvEnabled(srcComponent) {
-      let arrIdx = this.disabledTabs.indexOf(srcComponent.uid);
+      const arrIdx = this.disabledTabs.indexOf(srcComponent.uid);
       if (arrIdx !== -1) {
         this.disabledTabs.splice(arrIdx, 1);
       }
@@ -268,7 +307,9 @@ export default {
         return;
       }
 
-      const displayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+      const displayProp = window
+        .getComputedStyle(this.$refs.trigger)
+        .getPropertyValue('display');
 
       if (displayProp !== 'none') {
         const el = document.activeElement;
@@ -288,7 +329,9 @@ export default {
         return;
       }
 
-      const displayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+      const displayProp = window
+        .getComputedStyle(this.$refs.trigger)
+        .getPropertyValue('display');
 
       if (displayProp !== 'none') {
         if (!this.open) {
@@ -312,7 +355,9 @@ export default {
         return;
       }
 
-      const displayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+      const displayProp = window
+        .getComputedStyle(this.$refs.trigger)
+        .getPropertyValue('display');
       if (displayProp === 'none') {
         const newIndex = this.move(this.selectedId, false);
         const newId = this.tabs[newIndex].uid;
@@ -325,7 +370,7 @@ export default {
       let newIndex;
       let newId;
 
-      newIndex = this.tabs.findIndex(tab => tab.uid === id);
+      newIndex = this.tabs.findIndex((tab) => tab.uid === id);
 
       if (newIndex > -1) {
         newIndex = next ? newIndex + 1 : newIndex - 1;
@@ -335,7 +380,10 @@ export default {
       }
 
       newId = this.tabs[newIndex].uid;
-      while (newId === this.selectedId || this.disabledTabs.indexOf(newId) !== -1) {
+      while (
+        newId === this.selectedId ||
+        this.disabledTabs.indexOf(newId) !== -1
+      ) {
         if (newIndex > -1) {
           newIndex = next ? newIndex + 1 : newIndex - 1;
         }
@@ -352,7 +400,9 @@ export default {
         return;
       }
 
-      const displayProp = window.getComputedStyle(this.$refs.trigger).getPropertyValue('display');
+      const displayProp = window
+        .getComputedStyle(this.$refs.trigger)
+        .getPropertyValue('display');
       if (displayProp === 'none') {
         const newIndex = this.move(this.selectedId, true);
         const newId = this.tabs[newIndex].uid;
@@ -362,7 +412,7 @@ export default {
       }
     },
     selected(index) {
-      let selItem = this.tabs[index ? index : -1];
+      const selItem = this.tabs[index ? index : -1];
       this.selectedId = selItem ? selItem.uid : undefined;
     },
   },

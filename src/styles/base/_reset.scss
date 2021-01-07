@@ -8,7 +8,7 @@ body {
   margin:0;
   padding:0;
   width:100%;
-  @include rem("font-size", $regularSize);
+  @include rem("font-size", $regular-size);
   font-family:$regularFont;
   line-height:1.3;
 }

@@ -6,8 +6,12 @@
         <path d="M10 0L5 5 0 0z" />
       </svg>
     </div>
-    <ul :class="`${carbonPrefix}--tabs__nav ${carbonPrefix}--tabs__nav--hidden`">
-      <li :class="`cv-tab ${carbonPrefix}--tabs__nav-item ${carbonPrefix}--tabs__nav-item--selected`">
+    <ul
+      :class="`${carbonPrefix}--tabs__nav ${carbonPrefix}--tabs__nav--hidden`"
+    >
+      <li
+        :class="`cv-tab ${carbonPrefix}--tabs__nav-item ${carbonPrefix}--tabs__nav-item--selected`"
+      >
         <div :class="`${carbonPrefix}--tabs__nav-link`">&nbsp;</div>
       </li>
       <li :class="`cv-tab ${carbonPrefix}--tabs__nav-item`">

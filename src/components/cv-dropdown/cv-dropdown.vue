@@ -16,7 +16,7 @@
 -->
 
 <template>
-  <div :class="{ [`${carbonPrefix}--form-item`]: formItem }" :id="uid">
+  <div :id="uid" :class="{ [`${carbonPrefix}--form-item`]: formItem }">
     <div
       :class="[
         `${carbonPrefix}--dropdown__wrapper`,
@@ -32,11 +32,17 @@
       <span
         v-if="label"
         :id="`${uid}-label`"
-        :class="[`${carbonPrefix}--label`, { [`${carbonPrefix}--label--disabled`]: disabled }]"
+        :class="[
+          `${carbonPrefix}--label`,
+          { [`${carbonPrefix}--label--disabled`]: disabled },
+        ]"
         >{{ label }}</span
       >
 
       <div
+        v-bind="$attrs"
+        ref="listbox"
+        v-clickout="onClickout"
         data-dropdown
         :data-value="internalValue"
         :data-invalid="isInvalid"
@@ -53,17 +59,15 @@
             [`${carbonPrefix}--dropdown--show-selected`]: !hideSelected,
           },
         ]"
-        v-bind="$attrs"
         @keydown.down.prevent="onDown"
         @keydown.up.prevent="onUp"
         @keydown.enter.prevent="onClick"
         @keydown.esc.prevent="onEsc"
         @keydown.tab="onTab"
         @click="onClick"
-        v-clickout="onClickout"
-        ref="listbox"
       >
         <button
+          ref="button"
           :class="`${carbonPrefix}--list-box__field`"
           :aria-disabled="disabled"
           aria-haspopup="true"
@@ -72,45 +76,61 @@
           :aria-labelledby="ariaLabeledBy"
           :disabled="disabled"
           type="button"
-          ref="button"
         >
-          <WarningFilled16 v-if="isInvalid" :class="`${carbonPrefix}--list-box__invalid-icon`" />
+          <WarningFilled16
+            v-if="isInvalid"
+            :class="`${carbonPrefix}--list-box__invalid-icon`"
+          />
           <span
-            :class="`${carbonPrefix}--list-box__label`"
             :id="`${uid}-value`"
+            :class="`${carbonPrefix}--list-box__label`"
             data-test="internalCaption"
             v-html="internalCaption"
           />
           <div
-            :class="[`${carbonPrefix}--list-box__menu-icon`, { [`${carbonPrefix}--list-box__menu-icon--open`]: open }]"
+            :class="[
+              `${carbonPrefix}--list-box__menu-icon`,
+              { [`${carbonPrefix}--list-box__menu-icon--open`]: open },
+            ]"
           >
             <chevron-down-16 :aria-label="open ? 'Close menu' : 'Open menu'" />
           </div>
         </button>
         <ul
-          :class="`${carbonPrefix}--list-box__menu`"
           :id="`${uid}-menu`"
+          ref="droplist"
+          :class="`${carbonPrefix}--list-box__menu`"
           role="menu"
           :aria-hidden="!open ? 'true' : 'false'"
           :aria-labelledby="`${uid}-label`"
-          ref="droplist"
           tabindex="-1"
         >
           <slot>
-            <cv-dropdown-item v-for="item in items" v-bind:key="item" :value="item">{{ item }}</cv-dropdown-item>
+            <cv-dropdown-item v-for="item in items" :key="item" :value="item">{{
+              item
+            }}</cv-dropdown-item>
           </slot>
         </ul>
       </div>
-      <div v-if="isInvalid && inline" :class="`${carbonPrefix}--form-requirement`">
+      <div
+        v-if="isInvalid && inline"
+        :class="`${carbonPrefix}--form-requirement`"
+      >
         <slot name="invalid-message">{{ invalidMessage }}</slot>
       </div>
     </div>
-    <div v-if="isInvalid && !inline" :class="`${carbonPrefix}--form-requirement`">
+    <div
+      v-if="isInvalid && !inline"
+      :class="`${carbonPrefix}--form-requirement`"
+    >
       <slot name="invalid-message">{{ invalidMessage }}</slot>
     </div>
     <div
       v-if="!inline && !isInvalid && isHelper"
-      :class="[`${carbonPrefix}--form__helper-text`, { [`${carbonPrefix}--form__helper-text--disabled`]: disabled }]"
+      :class="[
+        `${carbonPrefix}--form__helper-text`,
+        { [`${carbonPrefix}--form__helper-text--disabled`]: disabled },
+      ]"
       :aria-disabled="disabled"
     >
       <slot name="helper-text">{{ helperText }}</slot>
@@ -119,7 +139,12 @@
 </template>
 
 <script>
-import { themeMixin, uidMixin, methodsMixin, carbonPrefixMixin } from '../../mixins';
+import {
+  themeMixin,
+  uidMixin,
+  methodsMixin,
+  carbonPrefixMixin,
+} from '../../mixins';
 import CvDropdownItem from './cv-dropdown-item';
 import WarningFilled16 from '@carbon/icons-vue/es/warning--filled/16';
 import ChevronDown16 from '@carbon/icons-vue/es/chevron--down/16';
@@ -127,10 +152,19 @@ import clickout from '../../directives/clickout';
 
 export default {
   name: 'CvDropdown',
-  inheritAttrs: false,
   directives: { clickout },
-  mixins: [themeMixin, uidMixin, carbonPrefixMixin, methodsMixin({ button: ['blur', 'focus'] })],
+  inheritAttrs: false,
+  mixins: [
+    themeMixin,
+    uidMixin,
+    carbonPrefixMixin,
+    methodsMixin({ button: ['blur', 'focus'] }),
+  ],
   components: { WarningFilled16, ChevronDown16, CvDropdownItem },
+  model: {
+    prop: 'value',
+    event: 'change',
+  },
   props: {
     disabled: Boolean,
     formItem: { type: Boolean, default: true },
@@ -163,28 +197,6 @@ export default {
       isInvalid: false,
       selectedChild: null,
     };
-  },
-  created() {
-    // add these on created otherwise cv:mounted is too late.
-    this.$on('cv:mounted', srcComponent => this.onCvMount(srcComponent));
-    this.$on('cv:beforeDestroy', srcComponent => this.onCvBeforeDestroy(srcComponent));
-  },
-  mounted() {
-    this.updateChildren(this.internalValue);
-    this.checkSlots();
-  },
-  updated() {
-    document.body.removeEventListener('click', this.checkSlots);
-    this.checkSlots();
-  },
-  model: {
-    prop: 'value',
-    event: 'change',
-  },
-  watch: {
-    value(val) {
-      this.internalValue = val;
-    },
   },
   computed: {
     ariaLabeledBy() {
@@ -230,6 +242,26 @@ export default {
       return { width: '100%' };
     },
   },
+  watch: {
+    value(val) {
+      this.internalValue = val;
+    },
+  },
+  created() {
+    // add these on created otherwise cv:mounted is too late.
+    this.$on('cv:mounted', (srcComponent) => this.onCvMount(srcComponent));
+    this.$on('cv:beforeDestroy', (srcComponent) =>
+      this.onCvBeforeDestroy(srcComponent)
+    );
+  },
+  mounted() {
+    this.updateChildren(this.internalValue);
+    this.checkSlots();
+  },
+  updated() {
+    document.body.removeEventListener('click', this.checkSlots);
+    this.checkSlots();
+  },
   methods: {
     onClickout() {
       this.open = false;
@@ -238,9 +270,9 @@ export default {
       const childItems = this.dropdownItems();
       let foundSelection = false;
 
-      for (let index in childItems) {
-        let child = childItems[index];
-        let selected = child.value === val;
+      for (const index in childItems) {
+        const child = childItems[index];
+        const selected = child.value === val;
         child.internalSelected = selected;
 
         if (selected) {
@@ -255,8 +287,14 @@ export default {
     },
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.isInvalid = !!(this.$slots['invalid-message'] || (this.invalidMessage && this.invalidMessage.length));
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.isInvalid = !!(
+        this.$slots['invalid-message'] ||
+        (this.invalidMessage && this.invalidMessage.length)
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
     onCvMount(srcComponent) {
       if (srcComponent.internalSelected) {
@@ -274,23 +312,27 @@ export default {
       }
     },
     dropdownItems() {
-      return this.$children.filter(item => item.$_CvDropdownItem);
+      return this.$children.filter((item) => item.$_CvDropdownItem);
     },
     doMove(up) {
       // requery could have changed
-      let currentFocusEl = this.$el.querySelector('.cv-dropdown-item :focus');
+      const currentFocusEl = this.$el.querySelector('.cv-dropdown-item :focus');
       let currentFocusValue;
-      let childItems = this.dropdownItems();
-      let last = childItems.length - 1;
+      const childItems = this.dropdownItems();
+      const last = childItems.length - 1;
       let currentFocusIndex = up ? 0 : last;
       let nextFocusIndex;
 
       if (currentFocusEl) {
-        currentFocusValue = currentFocusEl.parentNode.getAttribute('data-value');
+        currentFocusValue = currentFocusEl.parentNode.getAttribute(
+          'data-value'
+        );
       }
 
       if (currentFocusValue !== undefined) {
-        currentFocusIndex = childItems.findIndex(child => child.value === currentFocusValue);
+        currentFocusIndex = childItems.findIndex(
+          (child) => child.value === currentFocusValue
+        );
       }
 
       if (up) {
@@ -337,7 +379,10 @@ export default {
         if (this.$refs.button.$el === ev.target) {
           // button has focus ensure we are closed
           this.open = false;
-        } else if (ev.target === null || this.$refs.listbox.contains(ev.target)) {
+        } else if (
+          ev.target === null ||
+          this.$refs.listbox.contains(ev.target)
+        ) {
           // list has focus, close and return focus to dropdown
           this.open = false;
           this.doFocus();

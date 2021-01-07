@@ -14,7 +14,10 @@
     <label
       v-if="title"
       :for="uid"
-      :class="[`${carbonPrefix}--label`, { [`${carbonPrefix}--label--disabled`]: disabled }]"
+      :class="[
+        `${carbonPrefix}--label`,
+        { [`${carbonPrefix}--label--disabled`]: disabled },
+      ]"
       >{{ title }}</label
     >
 
@@ -43,8 +46,12 @@
       @keydown.esc.prevent="onEsc"
       @click="onClick"
     >
-      <WarningFilled16 v-if="isInvalid" :class="`${carbonPrefix}--list-box__invalid-icon`" />
+      <WarningFilled16
+        v-if="isInvalid"
+        :class="`${carbonPrefix}--list-box__invalid-icon`"
+      />
       <div
+        ref="button"
         role="button"
         aria-haspopup="true"
         :aria-expanded="open ? 'true' : 'false'"
@@ -55,26 +62,34 @@
         type="button"
         :aria-label="open ? 'close menu' : 'open menu'"
         data-toggle="true"
-        ref="button"
       >
         <cv-tag
-          :class="{ [`${carbonPrefix}--list-box__selection--multi`]: filterable && dataValue.length > 0 }"
-          :disabled="disabled"
           v-show="dataValue.length > 0"
+          ref="tag"
+          :class="{
+            [`${carbonPrefix}--list-box__selection--multi`]:
+              filterable && dataValue.length > 0,
+          }"
+          :disabled="disabled"
           :kind="filterTagKind"
           filter
           :label="`${dataValue.length}`"
-          @remove="clearValues"
-          ref="tag"
           :style="filterableTagOverride"
+          @remove="clearValues"
         />
-        <span v-if="!filterable" :class="`${carbonPrefix}--list-box__label`">{{ label }}</span>
+        <span v-if="!filterable" :class="`${carbonPrefix}--list-box__label`">{{
+          label
+        }}</span>
         <template v-else>
           <input
             ref="input"
+            v-model="filter"
             :class="[
               `${carbonPrefix}--text-input`,
-              { [`${carbonPrefix}--text-input--empty`]: !filter || filter.length === 0 },
+              {
+                [`${carbonPrefix}--text-input--empty`]:
+                  !filter || filter.length === 0,
+              },
             ]"
             :aria-controls="uid"
             aria-autocomplete="list"
@@ -82,7 +97,6 @@
             :aria-expanded="open ? 'true' : 'false'"
             autocomplete="off"
             :placeholder="label"
-            v-model="filter"
             @input="onInput"
             @focus="inputFocus"
             @click.stop.prevent="inputClick"
@@ -102,47 +116,64 @@
           </div>
         </template>
         <div
-          :class="[`${carbonPrefix}--list-box__menu-icon`, { [`${carbonPrefix}--list-box__menu-icon--open`]: open }]"
+          :class="[
+            `${carbonPrefix}--list-box__menu-icon`,
+            { [`${carbonPrefix}--list-box__menu-icon--open`]: open },
+          ]"
           role="button"
         >
           <chevron-down-16 :aria-label="open ? 'Close menu' : 'Open menu'" />
         </div>
       </div>
 
-      <div :id="uid" :class="`${carbonPrefix}--list-box__menu`" role="listbox" ref="list">
+      <div
+        :id="uid"
+        ref="list"
+        :class="`${carbonPrefix}--list-box__menu`"
+        role="listbox"
+      >
         <div
           v-for="(item, index) in dataOptions"
           :key="`multi-select-${index}`"
+          ref="option"
           :class="[
             `${carbonPrefix}--list-box__menu-item`,
-            { [`${carbonPrefix}--list-box__menu-item--highlighted`]: highlighted === item.value },
+            {
+              [`${carbonPrefix}--list-box__menu-item--highlighted`]:
+                highlighted === item.value,
+            },
           ]"
-          ref="option"
           @click.stop.prevent="onItemClick(item.value)"
           @mousemove="onMousemove(item.value)"
           @mousedown.prevent
         >
           <div :class="`${carbonPrefix}--list-box__menu-item__option`">
             <cv-checkbox
+              v-model="dataValue"
               tabindex="-1"
               :form-item="false"
-              v-model="dataValue"
               :value="item.value"
               :name="item.name"
               :data-test="item.name"
               :label="item.label"
-              style="pointer-events: none;"
+              style="pointer-events: none"
             />
           </div>
         </div>
       </div>
     </div>
-    <div v-if="isInvalid && !inline" :class="`${carbonPrefix}--form-requirement`">
+    <div
+      v-if="isInvalid && !inline"
+      :class="`${carbonPrefix}--form-requirement`"
+    >
       <slot name="invalid-message">{{ invalidMessage }}</slot>
     </div>
     <div
       v-if="!inline && !isInvalid && isHelper"
-      :class="[`${carbonPrefix}--form__helper-text`, { [`${carbonPrefix}--form__helper-text--disabled`]: disabled }]"
+      :class="[
+        `${carbonPrefix}--form__helper-text`,
+        { [`${carbonPrefix}--form__helper-text--disabled`]: disabled },
+      ]"
     >
       <slot name="helper-text">{{ helperText }}</slot>
     </div>
@@ -150,7 +181,12 @@
 </template>
 
 <script>
-import { themeMixin, uidMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  themeMixin,
+  uidMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 import WarningFilled16 from '@carbon/icons-vue/es/warning--filled/16';
 import ChevronDown16 from '@carbon/icons-vue/es/chevron--down/16';
 import Close16 from '@carbon/icons-vue/es/close/16';
@@ -165,8 +201,17 @@ const selectionFeedbackOptions = ['top-after-reopen', 'top', 'fixed'];
 export default {
   name: 'CvMultiSelect',
   inheritAttrs: false,
-  mixins: [themeMixin, uidMixin, carbonPrefixMixin, methodsMixin({ button: ['blur', 'focus'] })],
+  mixins: [
+    themeMixin,
+    uidMixin,
+    carbonPrefixMixin,
+    methodsMixin({ button: ['blur', 'focus'] }),
+  ],
   components: { WarningFilled16, ChevronDown16, CvCheckbox, CvTag, Close16 },
+  model: {
+    prop: 'value',
+    event: 'change',
+  },
   props: {
     autoFilter: Boolean,
     autoHighlight: Boolean,
@@ -190,10 +235,15 @@ export default {
       required: true,
       validator(list) {
         const result = list.every(
-          item => typeof item.name === 'string' && typeof item.label === 'string' && typeof item.value === 'string'
+          (item) =>
+            typeof item.name === 'string' &&
+            typeof item.label === 'string' &&
+            typeof item.value === 'string'
         );
         if (!result) {
-          console.warn('CvMultiSelect - all options must have name, label and value');
+          console.warn(
+            'CvMultiSelect - all options must have name, label and value'
+          );
         }
         return result;
       },
@@ -203,7 +253,9 @@ export default {
       default: selectionFeedbackOptions[TOP_AFTER_REOPEN],
       validator(val) {
         if (!selectionFeedbackOptions.includes(val)) {
-          console.warn(`CvMultiSelect: invalid selectionFeedback "${val}", use one of ${selectionFeedbackOptions}`);
+          console.warn(
+            `CvMultiSelect: invalid selectionFeedback "${val}", use one of ${selectionFeedbackOptions}`
+          );
           return false;
         }
         return true;
@@ -222,45 +274,19 @@ export default {
       isInvalid: false,
     };
   },
-  model: {
-    prop: 'value',
-    event: 'change',
-  },
-  watch: {
-    highlight() {
-      this.highlighted = this.highlight;
-    },
-    value() {
-      this.dataValue = this.value.filter(item => this.dataOptions.some(opt => opt.value === item.trim()));
-    },
-    options() {
-      this.updateOptions();
-    },
-    selectionFeedback() {
-      this.updateOptions();
-    },
-  },
-  created() {
-    this.updateOptions();
-    this.dataValue = this.value.filter(item => this.dataOptions.some(opt => opt.value === item.trim()));
-  },
-  mounted() {
-    this.highlighted = this.value ? this.value : this.highlight; // override highlight with value if provided
-    this.checkSlots();
-  },
-  updated() {
-    this.checkSlots();
-  },
   computed: {
     highlighted: {
       get() {
         return this.dataHighlighted;
       },
       set(val) {
-        let firstMatchIndex = this.dataOptions.findIndex(item => item.value === val);
+        let firstMatchIndex = this.dataOptions.findIndex(
+          (item) => item.value === val
+        );
         if (firstMatchIndex < 0) {
           firstMatchIndex = this.dataOptions.length ? 0 : -1;
-          this.dataHighlighted = firstMatchIndex >= 0 ? this.dataOptions[0].value : '';
+          this.dataHighlighted =
+            firstMatchIndex >= 0 ? this.dataOptions[0].value : '';
         } else {
           this.dataHighlighted = val;
         }
@@ -286,11 +312,46 @@ export default {
       return this.filterable ? { marginTop: 0, marginBottom: 0 } : {};
     },
   },
+  watch: {
+    highlight() {
+      this.highlighted = this.highlight;
+    },
+    value() {
+      this.dataValue = this.value.filter((item) =>
+        this.dataOptions.some((opt) => opt.value === item.trim())
+      );
+    },
+    options() {
+      this.updateOptions();
+    },
+    selectionFeedback() {
+      this.updateOptions();
+    },
+  },
+  created() {
+    this.updateOptions();
+    this.dataValue = this.value.filter((item) =>
+      this.dataOptions.some((opt) => opt.value === item.trim())
+    );
+  },
+  mounted() {
+    this.highlighted = this.value ? this.value : this.highlight; // override highlight with value if provided
+    this.checkSlots();
+  },
+  updated() {
+    this.checkSlots();
+  },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.isInvalid = !!(this.$slots['invalid-message'] || (this.invalidMessage && this.invalidMessage.length));
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.isInvalid = !!(
+        this.$slots['invalid-message'] ||
+        (this.invalidMessage && this.invalidMessage.length)
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
     clearFilter() {
       this.filter = '';
@@ -299,12 +360,19 @@ export default {
       this.updateOptions();
     },
     checkHighlightPosition(newHiglight) {
-      if (this.$refs.list && this.$refs.option && this.$refs.option[newHiglight]) {
-        if (this.$refs.list.scrollTop > this.$refs.option[newHiglight].offsetTop) {
+      if (
+        this.$refs.list &&
+        this.$refs.option &&
+        this.$refs.option[newHiglight]
+      ) {
+        if (
+          this.$refs.list.scrollTop > this.$refs.option[newHiglight].offsetTop
+        ) {
           this.$refs.list.scrollTop = this.$refs.option[newHiglight].offsetTop;
         } else if (
           this.$refs.list.scrollTop + this.$refs.list.clientHeight <
-          this.$refs.option[newHiglight].offsetTop + this.$refs.option[newHiglight].offsetHeight
+          this.$refs.option[newHiglight].offsetTop +
+            this.$refs.option[newHiglight].offsetHeight
         ) {
           this.$refs.list.scrollTop =
             this.$refs.option[newHiglight].offsetTop +
@@ -316,7 +384,9 @@ export default {
     doMove(up) {
       if (this.dataOptions.length > 0) {
         // requery could have changed
-        const currentHighlight = this.dataOptions.findIndex(item => item.value === this.highlighted);
+        const currentHighlight = this.dataOptions.findIndex(
+          (item) => item.value === this.highlighted
+        );
         let newHiglight;
 
         if (up) {
@@ -340,7 +410,9 @@ export default {
       if (this.autoFilter) {
         const escFilter = this.filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const pat = new RegExp(escFilter, 'iu');
-        this.dataOptions = this.options.filter(opt => pat.test(opt.label)).slice(0);
+        this.dataOptions = this.options
+          .filter((opt) => pat.test(opt.label))
+          .slice(0);
       } else {
         this.dataOptions = this.options.slice(0);
       }
@@ -349,10 +421,15 @@ export default {
       }
 
       // multi select unique part
-      if (!this.sorting && this.selectionFeedback !== selectionFeedbackOptions[FIXED]) {
+      if (
+        !this.sorting &&
+        this.selectionFeedback !== selectionFeedbackOptions[FIXED]
+      ) {
         // if included in data value move to top
         this.dataOptions.sort(
-          (a, b) => (this.dataValue.includes(a.value) ? -1 : 1) - (this.dataValue.includes(b.value) ? -1 : 1)
+          (a, b) =>
+            (this.dataValue.includes(a.value) ? -1 : 1) -
+            (this.dataValue.includes(b.value) ? -1 : 1)
         );
       }
     },
@@ -361,7 +438,9 @@ export default {
       if (this.autoHighlight && this.dataOptions.length > 0) {
         // then highlight first match
         const filterRegex = new RegExp(this.filter, 'iu');
-        firstMatchIndex = this.dataOptions.findIndex(item => filterRegex.test(item.label));
+        firstMatchIndex = this.dataOptions.findIndex((item) =>
+          filterRegex.test(item.label)
+        );
         if (firstMatchIndex < 0) {
           firstMatchIndex = 0;
         }
@@ -376,7 +455,11 @@ export default {
       this.updateHighlight();
     },
     doOpen(newVal) {
-      if (newVal && !this.open && this.selectionFeedback === selectionFeedbackOptions[TOP_AFTER_REOPEN]) {
+      if (
+        newVal &&
+        !this.open &&
+        this.selectionFeedback === selectionFeedbackOptions[TOP_AFTER_REOPEN]
+      ) {
         this.updateOptions();
       }
       this.open = newVal;
@@ -438,7 +521,10 @@ export default {
       this.$emit('change', this.dataValue);
     },
     onFocusOut(ev) {
-      if (!this.$el.contains(ev.relatedTarget) && !this.$refs.tag.$el.contains(ev.target)) {
+      if (
+        !this.$el.contains(ev.relatedTarget) &&
+        !this.$refs.tag.$el.contains(ev.target)
+      ) {
         this.doOpen(false);
       }
     },
@@ -446,7 +532,7 @@ export default {
       this.highlighted = val;
     },
     onItemClick(val) {
-      const index = this.dataValue.findIndex(item => val === item);
+      const index = this.dataValue.findIndex((item) => val === item);
       if (index > -1) {
         this.dataValue.splice(index, 1);
       } else {

@@ -21,7 +21,9 @@ export default {
       return this.svg !== undefined && this.svg.indexOf('<svg') >= 0;
     },
     isSymbol() {
-      return this.svg !== undefined && !this.isSvg && this.svg.indexOf('#') >= 0;
+      return (
+        this.svg !== undefined && !this.isSvg && this.svg.indexOf('#') >= 0
+      );
     },
   },
   render(createElement) {
@@ -31,7 +33,9 @@ export default {
       return createElement('svg', { domProps: { innerHTML: this.svg } });
     } else {
       if (this.isSymbol) {
-        return createElement('svg', {}, [createElement('use', { attrs: { href: this.svg } })]);
+        return createElement('svg', {}, [
+          createElement('use', { attrs: { href: this.svg } }),
+        ]);
       } else {
         return createElement('img', { attrs: { src: this.svg } });
       }

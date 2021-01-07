@@ -25,7 +25,7 @@ export default {
     kind: {
       type: String,
       default: 'wide',
-      validator: val => ['wide', 'narrow', 'condensed'].includes(val),
+      validator: (val) => ['wide', 'narrow', 'condensed'].includes(val),
     },
   },
 };

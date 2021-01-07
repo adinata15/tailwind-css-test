@@ -1,5 +1,8 @@
 <template>
-  <nav :class="`${carbonPrefix}--breadcrumb ${carbonPrefix}--skeleton`" :aria-label="ariaLabel">
+  <nav
+    :class="`${carbonPrefix}--breadcrumb ${carbonPrefix}--skeleton`"
+    :aria-label="ariaLabel"
+  >
     <cv-breadcrumb-item-skeleton></cv-breadcrumb-item-skeleton>
     <cv-breadcrumb-item-skeleton></cv-breadcrumb-item-skeleton>
     <cv-breadcrumb-item-skeleton></cv-breadcrumb-item-skeleton>
@@ -12,10 +15,10 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvBreadcrumbSkeleton',
-  mixins: [carbonPrefixMixin],
   components: {
     CvBreadcrumbItemSkeleton,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     ariaLabel: { type: String, default: 'breadcrumb' },
   },

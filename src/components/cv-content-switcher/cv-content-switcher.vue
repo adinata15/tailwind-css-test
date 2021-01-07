@@ -35,17 +35,11 @@ const toggleContent = (selector, on) => {
 export default {
   name: 'CvContentSwitcher',
   mixins: [carbonPrefixMixin, themeMixin],
-  created() {
-    // add these on created otherwise cv:mounted is too late.
-    this.$on('cv:open', srcComponent => this.onCvOpen(srcComponent));
-    this.$on('cv:mounted', srcComponent => this.onCvMount(srcComponent));
-    this.$on('cv:beforeDestroy', srcComponent => this.onCvBeforeDestroy(srcComponent));
-  },
   props: {
     size: {
       type: String,
       default: undefined,
-      validator: val => ['', 'sm', 'xl'].includes(val),
+      validator: (val) => ['', 'sm', 'xl'].includes(val),
     },
   },
   data() {
@@ -53,9 +47,17 @@ export default {
       store: store,
     };
   },
+  created() {
+    // add these on created otherwise cv:mounted is too late.
+    this.$on('cv:open', (srcComponent) => this.onCvOpen(srcComponent));
+    this.$on('cv:mounted', (srcComponent) => this.onCvMount(srcComponent));
+    this.$on('cv:beforeDestroy', (srcComponent) =>
+      this.onCvBeforeDestroy(srcComponent)
+    );
+  },
   methods: {
     switcherButtons() {
-      return this.$children.filter(item => item.$_CvContentSwitcherButton);
+      return this.$children.filter((item) => item.$_CvContentSwitcherButton);
     },
     onCvMount(srcComponent) {
       this.processState(srcComponent, srcComponent.isSelected);
@@ -65,7 +67,7 @@ export default {
       if (srcComponent.isSelected) {
         const switcherButtons = this.switcherButtons();
 
-        for (let index in switcherButtons) {
+        for (const index in switcherButtons) {
           if (
             switcherButtons[index].$_CvContentSwitcherButton &&
             switcherButtons[index].buttonId !== srcComponent.buttonId
@@ -100,7 +102,7 @@ export default {
       if (state) {
         // if opening one button close others
         const switcherButtons = this.switcherButtons();
-        for (let index in switcherButtons) {
+        for (const index in switcherButtons) {
           if (switcherButtons[index].buttonId !== srcComponent.buttonId) {
             switcherButtons[index].close();
             innerProcessState(switcherButtons[index], false);
@@ -109,7 +111,12 @@ export default {
       }
     },
     onCvOpen(srcComponent) {
-      this.$emit('selected', srcComponent.ownerId ? srcComponent.ownerId : srcComponent.contentSelector);
+      this.$emit(
+        'selected',
+        srcComponent.ownerId
+          ? srcComponent.ownerId
+          : srcComponent.contentSelector
+      );
       this.processState(srcComponent, true);
     },
   },

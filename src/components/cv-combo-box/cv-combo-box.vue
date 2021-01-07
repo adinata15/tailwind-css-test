@@ -1,9 +1,16 @@
 <template>
-  <div class="cv-combo-box" :class="`${carbonPrefix}--list-box__wrapper`" @focusout="onFocusOut">
+  <div
+    class="cv-combo-box"
+    :class="`${carbonPrefix}--list-box__wrapper`"
+    @focusout="onFocusOut"
+  >
     <label
       v-if="title"
       :for="uid"
-      :class="[`${carbonPrefix}--label`, { [`${carbonPrefix}--label--disabled`]: disabled }]"
+      :class="[
+        `${carbonPrefix}--label`,
+        { [`${carbonPrefix}--label--disabled`]: disabled },
+      ]"
       >{{ title }}</label
     >
 
@@ -28,8 +35,12 @@
       @keydown.esc.prevent="onEsc"
       @click="onClick"
     >
-      <WarningFilled16 v-if="isInvalid" :class="[`${carbonPrefix}--list-box__invalid-icon`]" />
+      <WarningFilled16
+        v-if="isInvalid"
+        :class="[`${carbonPrefix}--list-box__invalid-icon`]"
+      />
       <div
+        ref="button"
         role="button"
         aria-haspopup="true"
         :aria-expanded="open ? 'true' : 'false'"
@@ -40,13 +51,16 @@
         type="button"
         :aria-label="open ? 'close menu' : 'open menu'"
         data-toggle="true"
-        ref="button"
       >
         <input
           ref="input"
+          v-model="filter"
           :class="[
             `${carbonPrefix}--text-input`,
-            { [`${carbonPrefix}--text-input--empty`]: !filter || filter.length === 0 },
+            {
+              [`${carbonPrefix}--text-input--empty`]:
+                !filter || filter.length === 0,
+            },
           ]"
           :aria-controls="uid"
           aria-autocomplete="list"
@@ -56,7 +70,6 @@
           autocomplete="off"
           :disabled="disabled"
           :placeholder="label"
-          v-model="filter"
           @input="onInput"
           @focus="inputFocus"
           @click.stop.prevent="inputClick"
@@ -76,27 +89,41 @@
         </div>
 
         <div
-          :class="[`${carbonPrefix}--list-box__menu-icon`, { [`${carbonPrefix}--list-box__menu-icon--open`]: open }]"
+          :class="[
+            `${carbonPrefix}--list-box__menu-icon`,
+            { [`${carbonPrefix}--list-box__menu-icon--open`]: open },
+          ]"
           role="button"
         >
           <chevron-down-16 :aria-label="open ? 'Close menu' : 'Open menu'" />
         </div>
       </div>
 
-      <div v-show="open" :id="uid" :class="[`${carbonPrefix}--list-box__menu`]" role="listbox" ref="list">
+      <div
+        v-show="open"
+        :id="uid"
+        ref="list"
+        :class="[`${carbonPrefix}--list-box__menu`]"
+        role="listbox"
+      >
         <div
           v-for="(item, index) in dataOptions"
           :key="`combo-box-${index}`"
+          ref="option"
           :class="[
             `${carbonPrefix}--list-box__menu-item`,
-            { [`${carbonPrefix}--list-box__menu-item--highlighted`]: highlighted === item.value },
+            {
+              [`${carbonPrefix}--list-box__menu-item--highlighted`]:
+                highlighted === item.value,
+            },
           ]"
-          ref="option"
           @click.stop.prevent="onItemClick(item.value)"
           @mousemove="onMousemove(item.value)"
           @mousedown.prevent
         >
-          <div :class="[`${carbonPrefix}--list-box__menu-item__option`]">{{ item.label }}</div>
+          <div :class="[`${carbonPrefix}--list-box__menu-item__option`]">
+            {{ item.label }}
+          </div>
         </div>
       </div>
     </div>
@@ -105,7 +132,10 @@
     </div>
     <div
       v-if="!isInvalid && isHelper"
-      :class="[`${carbonPrefix}--form__helper-text`, { [`${carbonPrefix}--form__helper-text--disabled`]: disabled }]"
+      :class="[
+        `${carbonPrefix}--form__helper-text`,
+        { [`${carbonPrefix}--form__helper-text--disabled`]: disabled },
+      ]"
     >
       <slot name="helper-text">{{ helperText }}</slot>
     </div>
@@ -113,7 +143,12 @@
 </template>
 
 <script>
-import { themeMixin, uidMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  themeMixin,
+  uidMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 import WarningFilled16 from '@carbon/icons-vue/es/warning--filled/16';
 import ChevronDown16 from '@carbon/icons-vue/es/chevron--down/16';
 import Close16 from '@carbon/icons-vue/es/close/16';
@@ -121,8 +156,17 @@ import Close16 from '@carbon/icons-vue/es/close/16';
 export default {
   name: 'CvComboBox',
   inheritAttrs: false,
-  mixins: [themeMixin, uidMixin, carbonPrefixMixin, methodsMixin({ input: ['focus', 'blur'] })],
+  mixins: [
+    themeMixin,
+    uidMixin,
+    carbonPrefixMixin,
+    methodsMixin({ input: ['focus', 'blur'] }),
+  ],
   components: { WarningFilled16, ChevronDown16, Close16 },
+  model: {
+    prop: 'value',
+    event: 'change',
+  },
   props: {
     autoFilter: Boolean,
     autoHighlight: Boolean,
@@ -141,10 +185,15 @@ export default {
       required: true,
       validator(list) {
         const result = list.every(
-          item => typeof item.name === 'string' && typeof item.label === 'string' && typeof item.value === 'string'
+          (item) =>
+            typeof item.name === 'string' &&
+            typeof item.label === 'string' &&
+            typeof item.value === 'string'
         );
         if (!result) {
-          console.warn('CvComboBox - all options must have name, label and value');
+          console.warn(
+            'CvComboBox - all options must have name, label and value'
+          );
         }
         return result;
       },
@@ -161,9 +210,39 @@ export default {
       isInvalid: false,
     };
   },
-  model: {
-    prop: 'value',
-    event: 'change',
+  computed: {
+    highlighted: {
+      get() {
+        return this.dataHighlighted;
+      },
+      set(val) {
+        let firstMatchIndex = this.dataOptions.findIndex(
+          (item) => item.value === val
+        );
+        if (firstMatchIndex < 0) {
+          firstMatchIndex = this.dataOptions.length ? 0 : -1;
+          this.dataHighlighted =
+            firstMatchIndex >= 0 ? this.dataOptions[0].value : '';
+        } else {
+          this.dataHighlighted = val;
+        }
+        if (firstMatchIndex >= 0) {
+          this.$nextTick(() => {
+            // $nextTick to prevent highlight check ahead of list update on filter
+            this.checkHighlightPosition(firstMatchIndex);
+          });
+        }
+      },
+    },
+    filter: {
+      get() {
+        return this.dataFilter;
+      },
+      set(val) {
+        this.dataFilter = val ? val : '';
+        this.$emit('filter', val);
+      },
+    },
   },
   watch: {
     highlight() {
@@ -189,42 +268,17 @@ export default {
   updated() {
     this.checkSlots();
   },
-  computed: {
-    highlighted: {
-      get() {
-        return this.dataHighlighted;
-      },
-      set(val) {
-        let firstMatchIndex = this.dataOptions.findIndex(item => item.value === val);
-        if (firstMatchIndex < 0) {
-          firstMatchIndex = this.dataOptions.length ? 0 : -1;
-          this.dataHighlighted = firstMatchIndex >= 0 ? this.dataOptions[0].value : '';
-        } else {
-          this.dataHighlighted = val;
-        }
-        if (firstMatchIndex >= 0) {
-          this.$nextTick(() => {
-            // $nextTick to prevent highlight check ahead of list update on filter
-            this.checkHighlightPosition(firstMatchIndex);
-          });
-        }
-      },
-    },
-    filter: {
-      get() {
-        return this.dataFilter;
-      },
-      set(val) {
-        this.dataFilter = val ? val : '';
-        this.$emit('filter', val);
-      },
-    },
-  },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.isInvalid = !!(this.$slots['invalid-message'] || (this.invalidMessage && this.invalidMessage.length));
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.isInvalid = !!(
+        this.$slots['invalid-message'] ||
+        (this.invalidMessage && this.invalidMessage.length)
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
     clearFilter() {
       if (this.disabled) return;
@@ -236,12 +290,19 @@ export default {
       this.$emit('change', this.dataValue);
     },
     checkHighlightPosition(newHiglight) {
-      if (this.$refs.list && this.$refs.option && this.$refs.option[newHiglight]) {
-        if (this.$refs.list.scrollTop > this.$refs.option[newHiglight].offsetTop) {
+      if (
+        this.$refs.list &&
+        this.$refs.option &&
+        this.$refs.option[newHiglight]
+      ) {
+        if (
+          this.$refs.list.scrollTop > this.$refs.option[newHiglight].offsetTop
+        ) {
           this.$refs.list.scrollTop = this.$refs.option[newHiglight].offsetTop;
         } else if (
           this.$refs.list.scrollTop + this.$refs.list.clientHeight <
-          this.$refs.option[newHiglight].offsetTop + this.$refs.option[newHiglight].offsetHeight
+          this.$refs.option[newHiglight].offsetTop +
+            this.$refs.option[newHiglight].offsetHeight
         ) {
           this.$refs.list.scrollTop =
             this.$refs.option[newHiglight].offsetTop +
@@ -253,7 +314,9 @@ export default {
     doMove(up) {
       if (this.dataOptions.length > 0) {
         // requery could have changed
-        const currentHighlight = this.dataOptions.findIndex(item => item.value === this.highlighted);
+        const currentHighlight = this.dataOptions.findIndex(
+          (item) => item.value === this.highlighted
+        );
         let newHiglight;
 
         if (up) {
@@ -277,7 +340,9 @@ export default {
       if (this.autoFilter && this.filter) {
         const escFilter = this.filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const pat = new RegExp(escFilter, 'iu');
-        this.dataOptions = this.options.filter(opt => pat.test(opt.label)).slice(0);
+        this.dataOptions = this.options
+          .filter((opt) => pat.test(opt.label))
+          .slice(0);
       } else {
         this.dataOptions = this.options.slice(0);
       }
@@ -290,7 +355,9 @@ export default {
       if (this.autoHighlight && this.dataOptions.length > 0) {
         // then highlight first match
         const filterRegex = new RegExp(this.filter, 'iu');
-        firstMatchIndex = this.dataOptions.findIndex(item => filterRegex.test(item.label));
+        firstMatchIndex = this.dataOptions.findIndex((item) =>
+          filterRegex.test(item.label)
+        );
         if (firstMatchIndex < 0) {
           firstMatchIndex = 0;
         }
@@ -359,7 +426,7 @@ export default {
     },
     internalUpdateValue(val) {
       this.dataValue = val;
-      const filterOption = this.dataOptions.find(item => item.value === val);
+      const filterOption = this.dataOptions.find((item) => item.value === val);
       if (filterOption) {
         this.filter = filterOption.label;
       }

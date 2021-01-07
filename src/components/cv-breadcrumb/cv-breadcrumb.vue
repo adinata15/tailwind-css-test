@@ -1,7 +1,10 @@
 <template>
   <nav
     class="cv-breadcrumb"
-    :class="[`${carbonPrefix}--breadcrumb`, { [`${carbonPrefix}--breadcrumb--no-trailing-slash`]: noTrailingSlash }]"
+    :class="[
+      `${carbonPrefix}--breadcrumb`,
+      { [`${carbonPrefix}--breadcrumb--no-trailing-slash`]: noTrailingSlash },
+    ]"
     :aria-label="ariaLabel"
   >
     <slot></slot>

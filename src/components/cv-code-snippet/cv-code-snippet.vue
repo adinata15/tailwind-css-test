@@ -1,23 +1,29 @@
 <template>
   <component
-    :class="classes"
     :is="theComponent"
+    :class="classes"
     v-bind="$attrs"
-    @copy-code="onCopyCode"
     :copy-feedback="copyFeedback"
     :feedback-aria-label="feedbackAriaLabel"
-    :hideCopyButton="hideCopyButton"
+    :hide-copy-button="hideCopyButton"
     :wrap-text="wrapText"
+    @copy-code="onCopyCode"
   >
     <code ref="code">
       <slot></slot>
     </code>
     <!-- textarea cannot be fully hidden for clipboard to work -->
     <textarea
-      class="cv-code-snippet__clippy"
-      style="position: absolute; left: -9999px; max-width: 0; opacity: 0; overflow: hidden;"
-      aria-hidden="true"
       ref="clippy"
+      class="cv-code-snippet__clippy"
+      style="
+        position: absolute;
+        left: -9999px;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+      "
+      aria-hidden="true"
     ></textarea>
   </component>
 </template>
@@ -30,13 +36,13 @@ import { carbonPrefixMixin, themeMixin } from '../../mixins';
 
 export default {
   name: 'CvCodeSnippet',
-  inheritAttrs: false,
-  mixins: [carbonPrefixMixin, themeMixin],
   components: {
     CvCodeSnippetInline,
     CvCodeSnippetMultiline,
     CvCodeSnippetOneline,
   },
+  mixins: [carbonPrefixMixin, themeMixin],
+  inheritAttrs: false,
   props: {
     feedbackAriaLabel: { type: String, default: 'Copy code' },
     copyFeedback: { type: String, default: 'Copied!' },
@@ -44,7 +50,7 @@ export default {
     kind: {
       type: String,
       default: 'oneline',
-      validator: value => ['inline', 'multiline', 'oneline'].includes(value),
+      validator: (value) => ['inline', 'multiline', 'oneline'].includes(value),
     },
     wrapText: Boolean,
   },

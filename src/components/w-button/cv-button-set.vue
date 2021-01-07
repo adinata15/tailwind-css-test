@@ -1,5 +1,11 @@
 <template>
-  <div class="cv-button-set" :class="[`${carbonPrefix}--btn-set`, { [`${carbonPrefix}--btn-set--stacked`]: stacked }]">
+  <div
+    class="cv-button-set"
+    :class="[
+      `${carbonPrefix}--btn-set`,
+      { [`${carbonPrefix}--btn-set--stacked`]: stacked },
+    ]"
+  >
     <slot />
   </div>
 </template>

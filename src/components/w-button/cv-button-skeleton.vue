@@ -1,5 +1,9 @@
 <template>
-  <button disabled :class="buttonClassOpts({ skeleton: true })" type="button"></button>
+  <button
+    disabled
+    :class="buttonClassOpts({ skeleton: true })"
+    type="button"
+  ></button>
 </template>
 
 <script>

@@ -2,38 +2,40 @@
   <div :class="`cv-pagination ${carbonPrefix}--pagination`" data-pagination>
     <div :class="`${carbonPrefix}--pagination__left`">
       <cv-select
+        ref="pageSizeSelect"
         :class="`${carbonPrefix}--select__item-count`"
         :label="`${pageSizesLabel}`"
         inline
-        ref="pageSizeSelect"
-        @change="onPageSizeChange"
         :value="`${pageSizeValue}`"
+        @change="onPageSizeChange"
       >
         <cv-select-option
           v-for="(size, index) in pageSizes"
           :key="index"
           :value="`${size.value ? size.value : size}`"
-          >{{ size.label ? size.label : size.value ? size.value : size }}</cv-select-option
+          >{{
+            size.label ? size.label : size.value ? size.value : size
+          }}</cv-select-option
         >
       </cv-select>
 
       <span :class="`${carbonPrefix}--pagination__text`">
         <span data-displayed-item-range>
-          <slot name="range-text" v-bind:scope="rangeProps">{{ rangeText }}</slot>
+          <slot name="range-text" :scope="rangeProps">{{ rangeText }}</slot>
         </span>
       </span>
     </div>
 
     <div :class="`${carbonPrefix}--pagination__right`">
       <cv-select
+        v-if="numberOfItems !== Infinity"
+        ref="pageSelect"
         :class="`${carbonPrefix}--select__page-number`"
         :label="`${pageNumberLabel}:`"
         inline
-        hideLabel
-        ref="pageSelect"
-        @change="onPageChange"
+        hide-label
         :value="`${pageValue}`"
-        v-if="numberOfItems !== Infinity"
+        @change="onPageChange"
       >
         <cv-select-option
           v-for="pageNumber in pages"
@@ -44,7 +46,7 @@
         >
       </cv-select>
       <span :class="`${carbonPrefix}--pagination__text`">
-        <slot name="of-n-pages" v-bind:scope="ofNPagesProps">{{ pageOfPages }}</slot>
+        <slot name="of-n-pages" :scope="ofNPagesProps">{{ pageOfPages }}</slot>
       </span>
 
       <button
@@ -55,8 +57,8 @@
         ]"
         data-page-backward
         :aria-label="backwardText"
-        @click="onPrevPage"
         :disabled="noWayBack"
+        @click="onPrevPage"
       >
         <CaretLeft16 :class="`${carbonPrefix}--pagination__button-icon`" />
       </button>
@@ -69,8 +71,8 @@
         ]"
         data-page-forward
         :aria-label="forwardText"
-        @click="onNextPage"
         :disabled="noWayForward"
+        @click="onNextPage"
       >
         <CaretRight16 :class="`${carbonPrefix}--pagination__button-icon`" />
       </button>
@@ -97,15 +99,15 @@ const newPageValue = (page, lastPage) => {
   return result;
 };
 
-const newPageSizeValue = pageSizes => {
+const newPageSizeValue = (pageSizes) => {
   // ensure nearest value to valid page size used.
-  for (let size of pageSizes) {
+  for (const size of pageSizes) {
     if (size.selected) {
       return size.value;
     }
   }
 
-  let firstOne = pageSizes[0];
+  const firstOne = pageSizes[0];
   return firstOne.value ? firstOne.value : firstOne;
 };
 
@@ -116,19 +118,20 @@ const newPageCount = (numberOfItems, pageSizeValue) => {
   return Math.max(1, Math.ceil(numberOfItems / pageSizeValue));
 };
 
-const newPagesArray = pageCount => {
+const newPagesArray = (pageCount) => {
   if (pageCount === Infinity) {
     return [];
   }
   return Array.from({ length: pageCount }, (val, key) => key + 1);
 };
 
-const newFirstItem = (pageValue, pageSizeValue) => 1 + (pageValue - 1) * pageSizeValue;
+const newFirstItem = (pageValue, pageSizeValue) =>
+  1 + (pageValue - 1) * pageSizeValue;
 
 export default {
   name: 'CvPagination',
-  mixins: [carbonPrefixMixin],
   components: { CvSelect, CvSelectOption, CaretLeft16, CaretRight16 },
+  mixins: [carbonPrefixMixin],
   props: {
     backwardsButtonDisabled: Boolean,
     forwardsButtonDisabled: Boolean,
@@ -149,38 +152,6 @@ export default {
       pageCount: 1,
       pages: [1],
     };
-  },
-  mounted() {
-    this.pageSizeValue = newPageSizeValue(this.pageSizes);
-    this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
-    this.pageValue = newPageValue(this.page, this.pageCount);
-    this.pages = newPagesArray(this.pageCount);
-    this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
-    // console.log(this.pageValue);
-    // always emit on mount
-    this.$emit('change', this.internalValue);
-  },
-  watch: {
-    numberOfItems() {
-      this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
-      this.pages = newPagesArray(this.pageCount);
-      this.pageValue = Math.min(this.pageCount, Math.ceil(this.firstItem / this.pageSizeValue));
-      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
-    },
-    page() {
-      this.pageValue = newPageValue(this.page, this.pageCount);
-      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
-    },
-    pageSizes(a, b) {
-      if (!a.some(item => !b.includes(item))) return; // /possible issue when pageSizes defined in DOM
-
-      this.pageSizeValue = newPageSizeValue(this.pageSizes);
-      this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
-      this.pages = newPagesArray(this.pageCount);
-      // Do not adjust pageValue to match firstItem. Could be incorrect if
-      // page was also set at the same time
-      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
-    },
   },
   computed: {
     noWayBack() {
@@ -207,7 +178,9 @@ export default {
       return {
         start: Math.min(this.firstItem, this.numberOfItems),
         end: Math.min(
-          this.firstItem + Math.min(parseInt(this.pageSizeValue, 10), this.actualItemsOnPage) - 1,
+          this.firstItem +
+            Math.min(parseInt(this.pageSizeValue, 10), this.actualItemsOnPage) -
+            1,
           this.numberOfItems
         ),
         items: this.numberOfItems,
@@ -229,6 +202,41 @@ export default {
         length: parseInt(this.pageSizeValue),
       };
     },
+  },
+  watch: {
+    numberOfItems() {
+      this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
+      this.pages = newPagesArray(this.pageCount);
+      this.pageValue = Math.min(
+        this.pageCount,
+        Math.ceil(this.firstItem / this.pageSizeValue)
+      );
+      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
+    },
+    page() {
+      this.pageValue = newPageValue(this.page, this.pageCount);
+      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
+    },
+    pageSizes(a, b) {
+      if (!a.some((item) => !b.includes(item))) return; // /possible issue when pageSizes defined in DOM
+
+      this.pageSizeValue = newPageSizeValue(this.pageSizes);
+      this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
+      this.pages = newPagesArray(this.pageCount);
+      // Do not adjust pageValue to match firstItem. Could be incorrect if
+      // page was also set at the same time
+      this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
+    },
+  },
+  mounted() {
+    this.pageSizeValue = newPageSizeValue(this.pageSizes);
+    this.pageCount = newPageCount(this.numberOfItems, this.pageSizeValue);
+    this.pageValue = newPageValue(this.page, this.pageCount);
+    this.pages = newPagesArray(this.pageCount);
+    this.firstItem = newFirstItem(this.pageValue, this.pageSizeValue);
+    // console.log(this.pageValue);
+    // always emit on mount
+    this.$emit('change', this.internalValue);
   },
   methods: {
     onPageChange(newVal) {

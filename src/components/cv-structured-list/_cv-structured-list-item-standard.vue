@@ -1,5 +1,7 @@
 <template>
-  <div :class="`cv-structured-list-item--standard ${carbonPrefix}--structured-list-row`">
+  <div
+    :class="`cv-structured-list-item--standard ${carbonPrefix}--structured-list-row`"
+  >
     <slot></slot>
   </div>
 </template>

@@ -21,10 +21,10 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvCodeSnippetInline',
-  mixins: [carbonPrefixMixin],
   components: {
     CvFeedbackButton,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     copyFeedback: String,
     feedbackAriaLabel: String,
@@ -32,7 +32,10 @@ export default {
   },
   computed: {
     classes() {
-      return [`${this.carbonPrefix}--snippet`, `${this.carbonPrefix}--snippet--inline`];
+      return [
+        `${this.carbonPrefix}--snippet`,
+        `${this.carbonPrefix}--snippet--inline`,
+      ];
     },
   },
 };

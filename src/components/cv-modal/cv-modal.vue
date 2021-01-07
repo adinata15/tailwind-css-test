@@ -1,7 +1,7 @@
 <template>
   <div
-    data-modal
     :id="uid"
+    data-modal
     :class="[
       `cv-modal ${carbonPrefix}--modal`,
       {
@@ -14,18 +14,18 @@
     @click.self="onExternalClick"
   >
     <div
+      v-bind="dialogAttrs"
+      ref="modalDialog"
       :class="[
         `${carbonPrefix}--modal-container`,
         { [`${carbonPrefix}--modal-container--${internalSize}`]: internalSize },
       ]"
-      v-bind="dialogAttrs"
-      ref="modalDialog"
     >
       <div
-        class="cv-modal__before-content"
         ref="beforeContent"
+        class="cv-modal__before-content"
         tabindex="0"
-        style="position: absolute; height: 1px; width: 1px; left: -9999px;"
+        style="position: absolute; height: 1px; width: 1px; left: -9999px"
         @focus="focusBeforeContent"
       />
       <div :class="`${carbonPrefix}--modal-header`">
@@ -36,44 +36,53 @@
           <slot name="title">Modal Title</slot>
         </p>
         <button
+          ref="close"
           :class="`${carbonPrefix}--modal-close`"
           type="button"
-          @click="onClose"
-          ref="close"
           :aria-label="closeAriaLabel"
+          @click="onClose"
         >
           <Close16 :class="`${carbonPrefix}--modal-close__icon`" />
         </button>
       </div>
 
       <div
-        :class="[`${carbonPrefix}--modal-content`, { [`${carbonPrefix}--modal-content--with-form`]: hasFormContent }]"
         ref="content"
+        :class="[
+          `${carbonPrefix}--modal-content`,
+          { [`${carbonPrefix}--modal-content--with-form`]: hasFormContent },
+        ]"
         :tabindex="scrollable ? 0 : undefined"
       >
         <slot name="content"></slot>
       </div>
 
-      <div :class="`${carbonPrefix}--modal-footer`" v-if="hasFooter">
-        <cv-button type="button" :kind="secondaryKind" @click="onSecondaryClick" v-if="hasSecondary" ref="secondary">
+      <div v-if="hasFooter" :class="`${carbonPrefix}--modal-footer`">
+        <cv-button
+          v-if="hasSecondary"
+          ref="secondary"
+          type="button"
+          :kind="secondaryKind"
+          @click="onSecondaryClick"
+        >
           <slot name="secondary-button">Secondary button</slot>
         </cv-button>
         <cv-button
+          v-if="hasPrimary"
+          ref="primary"
           :disabled="primaryButtonDisabled"
           type="button"
           :kind="primaryKind"
           @click="onPrimaryClick"
-          v-if="hasPrimary"
-          ref="primary"
         >
           <slot name="primary-button">Primary button</slot>
         </cv-button>
       </div>
       <div
-        class="cv-modal__after-content"
         ref="afterContent"
+        class="cv-modal__after-content"
         tabindex="0"
-        style="position: absolute; height: 1px; width: 1px; left: -9999px;"
+        style="position: absolute; height: 1px; width: 1px; left: -9999px"
         @focus="focusAfterContent"
       />
     </div>
@@ -87,10 +96,14 @@ import Close16 from '@carbon/icons-vue/es/close/16';
 
 export default {
   name: 'CvModal',
-  mixins: [uidMixin, carbonPrefixMixin],
   components: {
     CvButton,
     Close16,
+  },
+  mixins: [uidMixin, carbonPrefixMixin],
+  model: {
+    event: 'modelEvent',
+    prop: 'visible',
   },
   props: {
     alert: Boolean,
@@ -98,7 +111,7 @@ export default {
     kind: {
       type: String,
       default: '',
-      validator: val => ['', 'danger'].includes(val),
+      validator: (val) => ['', 'danger'].includes(val),
     },
     autoHideOff: Boolean,
     visible: Boolean,
@@ -115,24 +128,6 @@ export default {
       hasPrimary: false,
       hasSecondary: false,
     };
-  },
-  mounted() {
-    if (this.visible) {
-      this.show();
-    }
-    this.checkSlots();
-  },
-  updated() {
-    this.checkSlots();
-  },
-  watch: {
-    visible(val) {
-      if (val) {
-        this.show();
-      } else {
-        this.hide();
-      }
-    },
   },
   computed: {
     dialogAttrs() {
@@ -172,14 +167,35 @@ export default {
       }
     },
   },
-  model: {
-    event: 'modelEvent',
-    prop: 'visible',
+  watch: {
+    visible(val) {
+      if (val) {
+        this.show();
+      } else {
+        this.hide();
+      }
+    },
+  },
+  mounted() {
+    if (this.visible) {
+      this.show();
+    }
+    this.checkSlots();
+  },
+  updated() {
+    this.checkSlots();
+  },
+  beforeDestroy() {
+    if (this.dataVisible) {
+      this.$emit('after-modal-hidden');
+    }
   },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.hasFooter = !!(this.$slots['primary-button'] || this.$slots['secondary-button']);
+      this.hasFooter = !!(
+        this.$slots['primary-button'] || this.$slots['secondary-button']
+      );
       this.hasHeaderLabel = !!this.$slots.label;
       this.hasSecondary = !!this.$slots['secondary-button'];
       this.hasPrimary = !!this.$slots['primary-button'];
@@ -197,7 +213,9 @@ export default {
       this.$refs.close.focus();
     },
     onShown() {
-      const focusEl = this.$refs.content.querySelector('[data-modal-primary-focus]');
+      const focusEl = this.$refs.content.querySelector(
+        '[data-modal-primary-focus]'
+      );
       if (focusEl) {
         focusEl.focus();
       } else if (this.$slots['primary-button']) {
@@ -210,7 +228,8 @@ export default {
       this.$emit('modal-shown');
 
       // check to see if content scrollable
-      this.scrollable = this.$refs.content.scrollHeight > this.$refs.content.clientHeight;
+      this.scrollable =
+        this.$refs.content.scrollHeight > this.$refs.content.clientHeight;
 
       this.$el.removeEventListener('transitionend', this.onShown);
     },
@@ -227,7 +246,9 @@ export default {
     },
     show() {
       // prevent body scrolling
-      document.body.classList.add(`${this.carbonPrefix}--body--with-modal-open`);
+      document.body.classList.add(
+        `${this.carbonPrefix}--body--with-modal-open`
+      );
 
       this.$el.addEventListener('transitionend', this.onShown);
       this.dataVisible = true;
@@ -241,8 +262,10 @@ export default {
       }
     },
     hide() {
-      //restore any previous scrollability
-      document.body.classList.remove(`${this.carbonPrefix}--body--with-modal-open`);
+      // restore any previous scrollability
+      document.body.classList.remove(
+        `${this.carbonPrefix}--body--with-modal-open`
+      );
 
       if (this.dataVisible) {
         this.$el.addEventListener('transitionend', this.afterHide);
@@ -269,11 +292,6 @@ export default {
         this._maybeHide(ev, 'secondary-click');
       }
     },
-  },
-  beforeDestroy() {
-    if (this.dataVisible) {
-      this.$emit('after-modal-hidden');
-    }
   },
 };
 </script>

@@ -26,18 +26,22 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvAccordionSkeleton',
-  props: {
-    align: { type: String, default: 'start', validator: val => ['start', 'end', ''].includes(val) },
-    size: {
-      type: String,
-      default: '',
-      validator: val => ['sm', 'xl', ''].includes(val),
-    },
-  },
-  mixins: [carbonPrefixMixin],
   components: {
     CvSkeletonText,
     CvAccordionItemSkeleton,
+  },
+  mixins: [carbonPrefixMixin],
+  props: {
+    align: {
+      type: String,
+      default: 'start',
+      validator: (val) => ['start', 'end', ''].includes(val),
+    },
+    size: {
+      type: String,
+      default: '',
+      validator: (val) => ['sm', 'xl', ''].includes(val),
+    },
   },
 };
 </script>

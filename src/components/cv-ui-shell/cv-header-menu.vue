@@ -19,14 +19,17 @@
       @focusout="onFocusout"
     >
       {{ title }}
-      <chevron-down-glyph :class="`${carbonPrefix}--header__menu-arrow`" :aria-label="$attrs.ariaLabel" />
+      <chevron-down-glyph
+        :class="`${carbonPrefix}--header__menu-arrow`"
+        :aria-label="$attrs.ariaLabel"
+      />
     </a>
     <ul
+      ref="menu"
       :aria-label="$attrs.ariaLabel"
       :aria-labelledby="$attrs.ariaLabelledBy"
       :class="`${carbonPrefix}--header__menu`"
       role="menu"
-      ref="menu"
       @focusout="onFocusout"
     >
       <slot></slot>
@@ -40,8 +43,8 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvHeaderMenu',
-  mixins: [carbonPrefixMixin],
   components: { ChevronDownGlyph },
+  mixins: [carbonPrefixMixin],
   props: {
     title: String,
     hoverToggle: { type: Boolean, default: true },
@@ -65,7 +68,12 @@ export default {
       }
     },
     onFocusout(ev) {
-      if (!(this.$el.contains(ev.relatedTarget) || this.$refs.menu.contains(ev.relatedTarget))) {
+      if (
+        !(
+          this.$el.contains(ev.relatedTarget) ||
+          this.$refs.menu.contains(ev.relatedTarget)
+        )
+      ) {
         this.expanded = false;
       }
     },

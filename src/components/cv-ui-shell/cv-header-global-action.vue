@@ -1,6 +1,6 @@
 <template>
   <button
-    v-on="$listeners"
+    :id="uid"
     :class="[
       `cv-header-global-action`,
       `${carbonPrefix}--header__action`,
@@ -10,9 +10,9 @@
     aria-haspopup="true"
     :aria-controls="ariaControls"
     :aria-expanded="active ? 'true' : 'false'"
+    v-on="$listeners"
     @click="gaToggle"
     @focusout="gaFocusout"
-    :id="uid"
   >
     <slot />
   </button>
@@ -28,23 +28,10 @@ export default {
     active: Boolean,
     ariaControls: String,
   },
-  mounted() {
-    this.$parent.$emit('cv:panel-control-mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:panel-control-beforeDestroy', this);
-  },
   data() {
     return {
       dataActive: this.active,
     };
-  },
-  watch: {
-    expanded() {
-      if (this.active !== this.dataActive) {
-        this.gaToggle();
-      }
-    },
   },
   computed: {
     panelExpanded: {
@@ -56,6 +43,19 @@ export default {
         this.dataActive = val;
       },
     },
+  },
+  watch: {
+    expanded() {
+      if (this.active !== this.dataActive) {
+        this.gaToggle();
+      }
+    },
+  },
+  mounted() {
+    this.$parent.$emit('cv:panel-control-mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:panel-control-beforeDestroy', this);
   },
   methods: {
     gaToggle() {

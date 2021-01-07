@@ -1,5 +1,8 @@
 <template>
-  <div class="cv-code-snippet-oneline" :class="[`${carbonPrefix}--snippet`, `${carbonPrefix}--snippet--single`]">
+  <div
+    class="cv-code-snippet-oneline"
+    :class="[`${carbonPrefix}--snippet`, `${carbonPrefix}--snippet--single`]"
+  >
     <div :class="`${carbonPrefix}--snippet-container`">
       <pre>
         <slot></slot>
@@ -23,11 +26,11 @@ import Copy16 from '@carbon/icons-vue/es/copy/16';
 
 export default {
   name: 'CvCodeSnippetOneline',
-  mixins: [carbonPrefixMixin],
   components: {
     CvFeedbackButton,
     Copy16,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     copyFeedback: String,
     feedbackAriaLabel: String,

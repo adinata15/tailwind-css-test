@@ -7,13 +7,13 @@
   >
     <input
       v-bind="$attrs"
-      v-on="inputListeners"
       :id="uid"
+      ref="input"
       :checked="isChecked"
       :class="`${carbonPrefix}--radio-button`"
-      ref="input"
       type="radio"
       :value="value"
+      v-on="inputListeners"
     />
     <!-- symbol causes problem in codepen? -->
     <label :for="uid" :class="`${carbonPrefix}--radio-button__label`">
@@ -24,12 +24,22 @@
 </template>
 
 <script>
-import { uidMixin, radioMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  uidMixin,
+  radioMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 
 export default {
   name: 'CvRadioButton',
   inheritAttrs: false,
-  mixins: [uidMixin, radioMixin, carbonPrefixMixin, methodsMixin({ input: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    radioMixin,
+    carbonPrefixMixin,
+    methodsMixin({ input: ['blur', 'focus'] }),
+  ],
   props: {
     labelLeft: Boolean,
   },

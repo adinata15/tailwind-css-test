@@ -2,19 +2,31 @@
   <div :class="{ [`${carbonPrefix}--form-item`]: formItem }">
     <input
       v-bind="$attrs"
-      v-on="inputListeners"
-      :class="[`${carbonPrefix}--toggle-input`, { 'bx--toggle-input--small': small }]"
-      type="checkbox"
       :id="uid"
+      ref="input"
+      :class="[
+        `${carbonPrefix}--toggle-input`,
+        { 'bx--toggle-input--small': small },
+      ]"
+      type="checkbox"
       :checked="isChecked === true"
       :aria-checked="`${isChecked}`"
       :value="value"
-      ref="input"
+      v-on="inputListeners"
     />
-    <label :class="`${carbonPrefix}--toggle-input__label`" :for="uid" :aria-label="hiddenLabel">
+    <label
+      :class="`${carbonPrefix}--toggle-input__label`"
+      :for="uid"
+      :aria-label="hiddenLabel"
+    >
       {{ visibleLabel }}
       <span :class="`${carbonPrefix}--toggle__switch`">
-        <svg :class="`${carbonPrefix}--toggle__check`" width="6px" height="5px" viewBox="0 0 6 5">
+        <svg
+          :class="`${carbonPrefix}--toggle__check`"
+          width="6px"
+          height="5px"
+          viewBox="0 0 6 5"
+        >
           <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z" />
         </svg>
         <span :class="`${carbonPrefix}--toggle__text--off`" aria-hidden="true">
@@ -29,11 +41,21 @@
 </template>
 
 <script>
-import { uidMixin, checkMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  uidMixin,
+  checkMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 
 export default {
   name: 'CvToggle',
-  mixins: [uidMixin, checkMixin, carbonPrefixMixin, methodsMixin({ input: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    checkMixin,
+    carbonPrefixMixin,
+    methodsMixin({ input: ['blur', 'focus'] }),
+  ],
   inheritAttrs: false,
   props: {
     small: Boolean,

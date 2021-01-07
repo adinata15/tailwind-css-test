@@ -1,12 +1,12 @@
 <template>
   <div
+    :id="id"
     :class="[
       `cv-header-panel`,
       `${carbonPrefix}--header-panel`,
       { [`${carbonPrefix}--header-panel--expanded`]: panelExpanded },
     ]"
     :aria-hidden="!panelExpanded ? 'true' : 'false'"
-    :id="id"
     @focusout="onFocusout"
     @mousedown="onMouseDown"
   >
@@ -19,29 +19,18 @@ import { carbonPrefixMixin } from '../../mixins';
 export default {
   name: 'CvHeaderPanel',
   mixins: [carbonPrefixMixin],
+  model: {
+    event: 'modelEvent',
+    prop: 'expanded',
+  },
   props: {
     expanded: Boolean,
     id: { type: String, required: true },
-  },
-  mounted() {
-    this.$parent.$emit('cv:panel-mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:panel-beforeDestroy', this);
   },
   data() {
     return {
       dataExpanded: this.expanded,
     };
-  },
-  model: {
-    event: 'modelEvent',
-    prop: 'expanded',
-  },
-  watch: {
-    expanded() {
-      this.panelExpanded = this.expanded;
-    },
   },
   computed: {
     panelExpanded: {
@@ -56,6 +45,17 @@ export default {
         }
       },
     },
+  },
+  watch: {
+    expanded() {
+      this.panelExpanded = this.expanded;
+    },
+  },
+  mounted() {
+    this.$parent.$emit('cv:panel-mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:panel-beforeDestroy', this);
   },
   methods: {
     onFocusout(ev) {

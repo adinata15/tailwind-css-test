@@ -25,7 +25,11 @@ export default {
   computed: {
     internalOrdered() {
       if (this.nested && this.ordered === undefined) {
-        if (this.$parent && this.$parent.$parent && this.$parent.$parent.$_CvList) {
+        if (
+          this.$parent &&
+          this.$parent.$parent &&
+          this.$parent.$parent.$_CvList
+        ) {
           return this.$parent.$parent.internalOrdered;
         }
       }

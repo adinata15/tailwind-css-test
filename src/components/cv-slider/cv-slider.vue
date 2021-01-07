@@ -1,18 +1,37 @@
 <template>
   <div :class="`cv-slider ${carbonPrefix}--form-item`">
-    <label :for="uid" :class="[`${carbonPrefix}--label`, { [`${carbonPrefix}--label--disabled`]: disabled }]">
+    <label
+      :for="uid"
+      :class="[
+        `${carbonPrefix}--label`,
+        { [`${carbonPrefix}--label--disabled`]: disabled },
+      ]"
+    >
       {{ label }}
     </label>
     <div :class="`${carbonPrefix}--slider-container`">
-      <span :class="`${carbonPrefix}--slider__range-label`">{{ internalMinLabel }}</span>
+      <span :class="`${carbonPrefix}--slider__range-label`">{{
+        internalMinLabel
+      }}</span>
       <div
-        :class="[`${carbonPrefix}--slider`, { [`${carbonPrefix}--slider--disabled`]: disabled }]"
+        :class="[
+          `${carbonPrefix}--slider`,
+          { [`${carbonPrefix}--slider--disabled`]: disabled },
+        ]"
         data-slider
         data-slider-input-box="#slider-input-box"
       >
-        <div :class="`${carbonPrefix}--slider__track`" @click="onTrackClick" ref="track"></div>
-        <div :class="`${carbonPrefix}--slider__filled-track`" :style="`width: ${percentage};`"></div>
         <div
+          ref="track"
+          :class="`${carbonPrefix}--slider__track`"
+          @click="onTrackClick"
+        ></div>
+        <div
+          :class="`${carbonPrefix}--slider__filled-track`"
+          :style="`width: ${percentage};`"
+        ></div>
+        <div
+          ref="thumb"
           :class="[
             `${carbonPrefix}--slider__thumb`,
             {
@@ -21,46 +40,61 @@
           ]"
           tabindex="0"
           :style="`left: ${percentage};`"
-          ref="thumb"
           @keydown.up.right.prevent="onUp"
           @keydown.down.left.prevent="onDown"
           @mousedown="onStartDrag"
         ></div>
         <input
           :id="uid"
+          ref="range"
           :class="`${carbonPrefix}--slider__input`"
           type="range"
           :step="step"
           :min="min"
           :max="max"
-          ref="range"
         />
       </div>
-      <span :class="`${carbonPrefix}--slider__range-label`">{{ internalMaxLabel }}</span>
+      <span :class="`${carbonPrefix}--slider__range-label`">{{
+        internalMaxLabel
+      }}</span>
       <input
+        ref="inputBox"
+        v-model="internalValue"
         type="number"
         :class="[
           `${carbonPrefix}--text-input ${carbonPrefix}--slider-text-input`,
           { [`${carbonPrefix}--text-input--light`]: isLight },
         ]"
         :placeholder="min"
-        v-model="internalValue"
+        :disabled="disabled"
         @change="onChange"
-        ref="inputBox"
         @keydown.up.prevent="onUp"
         @keydown.down.prevent="onDown"
-        :disabled="disabled"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { uidMixin, themeMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  uidMixin,
+  themeMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 
 export default {
   name: 'CvSlider',
-  mixins: [uidMixin, themeMixin, carbonPrefixMixin, methodsMixin({ thumb: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    themeMixin,
+    carbonPrefixMixin,
+    methodsMixin({ thumb: ['blur', 'focus'] }),
+  ],
+  model: {
+    prop: 'value',
+    event: 'modelEvent',
+  },
   props: {
     disabled: Boolean,
     label: String,
@@ -73,7 +107,7 @@ export default {
       default: '4',
       validator(val) {
         if (val.length) {
-          let intMultiplier = parseInt(val);
+          const intMultiplier = parseInt(val);
           if (isNaN(intMultiplier) || intMultiplier < 1) {
             console.warn('cv-slider: multiplier must be >= 1');
             return false;
@@ -85,10 +119,6 @@ export default {
     value: String,
     minLabel: String,
     maxLabel: String,
-  },
-  model: {
-    prop: 'value',
-    event: 'modelEvent',
   },
   data() {
     return {
@@ -108,15 +138,10 @@ export default {
       return this.maxLabel !== undefined ? this.maxLabel : this.getMax();
     },
     internalMultiplier() {
-      let intMultiplier = parseInt(this.stepMultiplier);
+      const intMultiplier = parseInt(this.stepMultiplier);
       // default to 4 fro multiplier
       return isNaN(intMultiplier) ? 4 : Math.max(intMultiplier, 1);
     },
-  },
-  mounted() {
-    this.$refs.range.value = this.value;
-    this.internalValue = this.$refs.range.value;
-    this.percentage = `${((this.internalValue - this.getMin()) * 100) / (this.getMax() - this.getMin())}%`;
   },
   watch: {
     value(val) {
@@ -138,6 +163,14 @@ export default {
         this.setValue(this.internalValue);
       });
     },
+  },
+  mounted() {
+    this.$refs.range.value = this.value;
+    this.internalValue = this.$refs.range.value;
+    this.percentage = `${
+      ((this.internalValue - this.getMin()) * 100) /
+      (this.getMax() - this.getMin())
+    }%`;
   },
   methods: {
     // NOTE: It is not safe to rely on Numbers for non-integer steps
@@ -176,13 +209,18 @@ export default {
       this.$refs.range.value = newValue;
       this.internalValue = this.$refs.range.value;
 
-      this.percentage = `${((this.internalValue - this.getMin()) * 100) / (this.getMax() - this.getMin())}%`;
+      this.percentage = `${
+        ((this.internalValue - this.getMin()) * 100) /
+        (this.getMax() - this.getMin())
+      }%`;
 
       this.$emit('modelEvent', this.$refs.range.value);
       this.$emit('change', this.$refs.range.value);
     },
     onChange() {
-      let newValue = this.internalValue.length ? parseFloat(this.internalValue) : this.getMin();
+      const newValue = this.internalValue.length
+        ? parseFloat(this.internalValue)
+        : this.getMin();
       this.setValue(newValue);
     },
     onStartDrag(ev) {
@@ -196,9 +234,11 @@ export default {
     onDrag(ev) {
       if (this.isDragging) {
         // percentage change
-        let newValue = (ev.clientX - this.dragStartX) / this.$refs.track.offsetWidth;
+        let newValue =
+          (ev.clientX - this.dragStartX) / this.$refs.track.offsetWidth;
         // uncapped new value
-        newValue = this.dragStartValue + (this.getMax() - this.getMin()) * newValue;
+        newValue =
+          this.dragStartValue + (this.getMax() - this.getMin()) * newValue;
 
         this.setValue(newValue, ev);
       }
@@ -209,7 +249,7 @@ export default {
       document.body.removeEventListener('mouseup', this.onStopDrag);
     },
     onTrackClick(ev) {
-      const afterAnimate = ev => {
+      const afterAnimate = (ev) => {
         if (ev.propertyName === 'left') {
           this.animateClick = false;
           this.$refs.thumb.removeEventListener('transitionend', afterAnimate);
@@ -224,13 +264,27 @@ export default {
       this.setValue(newValue, ev);
     },
     onUp(ev) {
-      let curValue = ev.target.type === 'number' ? parseFloat(ev.target.value) : this.getValue();
-      let newValue = curValue + (ev.shiftKey ? this.internalMultiplier * this.getStep() : this.getStep());
+      const curValue =
+        ev.target.type === 'number'
+          ? parseFloat(ev.target.value)
+          : this.getValue();
+      const newValue =
+        curValue +
+        (ev.shiftKey
+          ? this.internalMultiplier * this.getStep()
+          : this.getStep());
       this.setValue(newValue, ev);
     },
     onDown(ev) {
-      let curValue = ev.target.type === 'number' ? parseFloat(ev.target.value) : this.getValue();
-      let newValue = curValue - (ev.shiftKey ? this.internalMultiplier * this.getStep() : this.getStep());
+      const curValue =
+        ev.target.type === 'number'
+          ? parseFloat(ev.target.value)
+          : this.getValue();
+      const newValue =
+        curValue -
+        (ev.shiftKey
+          ? this.internalMultiplier * this.getStep()
+          : this.getStep());
       this.setValue(newValue, ev);
     },
   },

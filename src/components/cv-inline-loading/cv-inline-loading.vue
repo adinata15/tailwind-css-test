@@ -1,5 +1,10 @@
 <template>
-  <div data-inline-loading :class="`${carbonPrefix}--inline-loading`" role="alert" aria-live="assertive">
+  <div
+    data-inline-loading
+    :class="`${carbonPrefix}--inline-loading`"
+    role="alert"
+    aria-live="assertive"
+  >
     <div
       :class="[
         `${carbonPrefix}--inline-loading__animation`,
@@ -7,19 +12,34 @@
       ]"
     >
       <div
-        v-show="internalState === STATES.LOADING || internalState === STATES.ENDING"
+        v-show="
+          internalState === STATES.LOADING || internalState === STATES.ENDING
+        "
         :class="`${carbonPrefix}--loading ${carbonPrefix}--loading--small`"
       >
         <svg :class="`${carbonPrefix}--loading__svg`" viewBox="-75 -75 150 150">
-          <circle :class="`${carbonPrefix}--loading__background`" cx="0" cy="0" r="26.8125" />
-          <circle :class="`${carbonPrefix}--loading__stroke`" cx="0" cy="0" r="26.8125" />
+          <circle
+            :class="`${carbonPrefix}--loading__background`"
+            cx="0"
+            cy="0"
+            r="26.8125"
+          />
+          <circle
+            :class="`${carbonPrefix}--loading__stroke`"
+            cx="0"
+            cy="0"
+            r="26.8125"
+          />
         </svg>
       </div>
       <CheckmarkFilled16
         :hidden="internalState !== STATES.LOADED"
         :class="`${carbonPrefix}--inline-loading__checkmark-container`"
       />
-      <ErrorFilled16 :hidden="internalState !== STATES.ERROR" :class="`${carbonPrefix}--inline-loading--error`" />
+      <ErrorFilled16
+        :hidden="internalState !== STATES.ERROR"
+        :class="`${carbonPrefix}--inline-loading--error`"
+      />
     </div>
     <p :class="`${carbonPrefix}--inline-loading__text`">{{ stateText }}</p>
   </div>
@@ -35,16 +55,15 @@ export default {
   name: 'CvInlineLoading',
   components: { ErrorFilled16, CheckmarkFilled16 },
   mixins: [carbonPrefixMixin],
-  created() {
-    this.STATES = STATES;
-  },
   props: {
     active: {
       type: Boolean,
       default: undefined,
-      validator: val => {
+      validator: (val) => {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('CvInlineLoading: active prop deprecated in favour of state prop');
+          console.warn(
+            'CvInlineLoading: active prop deprecated in favour of state prop'
+          );
         }
         return true;
       },
@@ -56,11 +75,19 @@ export default {
     state: {
       type: String,
       default: undefined,
-      validator: val => {
-        if (Object.keys(STATES).some(state => STATES[state] === val.toLowerCase())) {
+      validator: (val) => {
+        if (
+          Object.keys(STATES).some(
+            (state) => STATES[state] === val.toLowerCase()
+          )
+        ) {
           return true;
         } else {
-          console.error(`CvInlineLoading: Valid states are ${JSON.stringify(Object.values(STATES))}`);
+          console.error(
+            `CvInlineLoading: Valid states are ${JSON.stringify(
+              Object.values(STATES)
+            )}`
+          );
           return false;
         }
       },
@@ -76,16 +103,19 @@ export default {
     },
     stateText() {
       switch (this.internalState) {
-        case STATES.LOADED:
-          return this.loadedText;
-        case STATES.ERROR:
-          return this.errorText;
-        case STATES.ENDING:
-          return this.endingText;
-        default:
-          return this.loadingText;
+      case STATES.LOADED:
+        return this.loadedText;
+      case STATES.ERROR:
+        return this.errorText;
+      case STATES.ENDING:
+        return this.endingText;
+      default:
+        return this.loadingText;
       }
     },
+  },
+  created() {
+    this.STATES = STATES;
   },
 };
 </script>

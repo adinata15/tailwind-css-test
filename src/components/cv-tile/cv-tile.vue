@@ -1,12 +1,15 @@
 <template>
   <component
     :is="tagType"
-    :class="[`cv-tile ${carbonPrefix}--tile`, { [`${carbonPrefix}--tile--light`]: isLight }]"
+    v-bind="$attrs"
+    ref="tile"
+    :class="[
+      `cv-tile ${carbonPrefix}--tile`,
+      { [`${carbonPrefix}--tile--light`]: isLight },
+    ]"
     :checked="selected"
     :expanded="expanded"
-    v-bind="$attrs"
     v-on="$listeners"
-    ref="tile"
   >
     <!-- can i now click on this -->
     <template>
@@ -33,7 +36,11 @@ export default {
     prop: 'modelValue',
     event: 'modelEvent',
   },
-  mixins: [themeMixin, carbonPrefixMixin, methodsMixin({ tile: ['blur', 'focus'] })],
+  mixins: [
+    themeMixin,
+    carbonPrefixMixin,
+    methodsMixin({ tile: ['blur', 'focus'] }),
+  ],
   components: {
     CvTileClickable,
     CvTileExpandable,
@@ -46,7 +53,10 @@ export default {
     kind: {
       type: String,
       default: '',
-      validator: value => ['clickable', 'expandable', 'selectable', 'standard', ''].includes(value),
+      validator: (value) =>
+        ['clickable', 'expandable', 'selectable', 'standard', ''].includes(
+          value
+        ),
     },
   },
   computed: {

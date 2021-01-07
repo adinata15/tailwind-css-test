@@ -9,11 +9,16 @@ import carbonPrefixMixin from '../../mixins/carbon-prefix-mixin';
 
 const breakpointProp = {
   type: [Boolean, Number, Object],
-  validator: value => {
+  validator: (value) => {
     if (typeof value === 'number' || typeof value === 'boolean') {
       return true;
     } else if (typeof value === 'object') {
-      return 'span' in value && typeof value.span === 'number' && 'offset' in value && typeof value.offset === 'number';
+      return (
+        'span' in value &&
+        typeof value.span === 'number' &&
+        'offset' in value &&
+        typeof value.offset === 'number'
+      );
     }
 
     return false;
@@ -40,7 +45,7 @@ export default {
         { name: 'lg', value: this.lg },
         { name: 'xlg', value: this.xlg },
         { name: 'max', value: this.max },
-      ].filter(breakpoint => breakpoint.value !== false);
+      ].filter((breakpoint) => breakpoint.value !== false);
 
       for (let i = 0; i < breakpoints.length; i += 1) {
         const { name, value } = breakpoints[i];

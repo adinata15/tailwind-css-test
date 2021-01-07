@@ -4,6 +4,7 @@
     <p :class="`${carbonPrefix}--label-description`">{{ helperText }}</p>
     <div :class="`${carbonPrefix}--file`" data-file>
       <label
+        ref="focusTarget"
         :for="uid"
         :class="[
           {
@@ -14,7 +15,6 @@
         ]"
         role="button"
         tabindex="0"
-        ref="focusTarget"
         @keydown.enter.prevent="onShow()"
         @keydown.space.prevent
         @keyup.space.prevent="onShow()"
@@ -31,26 +31,26 @@
           <input
             v-if="kind !== 'button'"
             v-bind="$attrs"
+            :id="uid"
+            ref="file-input"
             type="file"
             :class="`${carbonPrefix}--file-input`"
-            :id="uid"
             data-file-uploader
             data-target="[data-file-container]"
             v-on="inputListeners"
-            ref="file-input"
           />
         </cv-wrapper>
       </label>
       <input
         v-if="kind === 'button'"
         v-bind="$attrs"
+        :id="uid"
+        ref="file-input"
         type="file"
         :class="`${carbonPrefix}--file-input`"
-        :id="uid"
         data-file-uploader
         data-target="[data-file-container]"
         v-on="inputListeners"
-        ref="file-input"
       />
 
       <div data-file-container :class="`${carbonPrefix}--file-container`">
@@ -67,7 +67,9 @@
             :tag-type="isInvalid(index) ? 'div' : ''"
             :class="`${carbonPrefix}--file__selected-file ${carbonPrefix}--file__selected-file--invalid`"
           >
-            <p :class="`${carbonPrefix}--file-filename`">{{ file.file.name }}</p>
+            <p :class="`${carbonPrefix}--file-filename`">
+              {{ file.file.name }}
+            </p>
 
             <span
               :data-for="uid"
@@ -75,20 +77,45 @@
               :data-test="file.state"
               :style="stateStyleOverides"
             >
-              <div v-if="file.state === 'uploading'" :class="`${carbonPrefix}--inline-loading__animation`">
-                <div data-inline-loading-spinner :class="`${carbonPrefix}--loading ${carbonPrefix}--loading--small`">
-                  <svg :class="`${carbonPrefix}--loading__svg`" viewBox="-75 -75 150 150">
-                    <circle :class="`${carbonPrefix}--loading__background`" cx="0" cy="0" r="37.5" />
-                    <circle :class="`${carbonPrefix}--loading__stroke`" cx="0" cy="0" r="37.5" />
+              <div
+                v-if="file.state === 'uploading'"
+                :class="`${carbonPrefix}--inline-loading__animation`"
+              >
+                <div
+                  data-inline-loading-spinner
+                  :class="`${carbonPrefix}--loading ${carbonPrefix}--loading--small`"
+                >
+                  <svg
+                    :class="`${carbonPrefix}--loading__svg`"
+                    viewBox="-75 -75 150 150"
+                  >
+                    <circle
+                      :class="`${carbonPrefix}--loading__background`"
+                      cx="0"
+                      cy="0"
+                      r="37.5"
+                    />
+                    <circle
+                      :class="`${carbonPrefix}--loading__stroke`"
+                      cx="0"
+                      cy="0"
+                      r="37.5"
+                    />
                   </svg>
                 </div>
               </div>
-              <CheckmarkFilled16 v-if="file.state === 'complete'" :class="`${carbonPrefix}--file-complete`" />
-              <WarningFilled16 v-if="isInvalid(index)" :class="`${carbonPrefix}--file--invalid`" />
+              <CheckmarkFilled16
+                v-if="file.state === 'complete'"
+                :class="`${carbonPrefix}--file-complete`"
+              />
+              <WarningFilled16
+                v-if="isInvalid(index)"
+                :class="`${carbonPrefix}--file--invalid`"
+              />
               <button
+                v-if="removable"
                 type="button"
                 :class="`${carbonPrefix}--file-close`"
-                v-if="removable"
                 :alt="removeAriaLabel"
                 :arial-label="removeAriaLabel"
                 @click="remove(index)"
@@ -96,11 +123,16 @@
                 <Close16 />
               </button>
             </span>
-            <div v-if="isInvalid(index)" :class="`${carbonPrefix}--form-requirement`">
+            <div
+              v-if="isInvalid(index)"
+              :class="`${carbonPrefix}--form-requirement`"
+            >
               <div :class="`${carbonPrefix}--form-requirement__title`">
                 {{ file.invalidMessageTitle || 'Invalid file' }}
               </div>
-              <p :class="`${carbonPrefix}--form-requirement__supplement`">{{ file.invalidMessage }}</p>
+              <p :class="`${carbonPrefix}--form-requirement__supplement`">
+                {{ file.invalidMessage }}
+              </p>
             </div>
           </cv-wrapper>
         </div>
@@ -120,20 +152,36 @@ import { STATES, KINDS } from './consts.js';
 
 export default {
   name: 'CvFileUploader',
-  components: { CvFormItem, CheckmarkFilled16, WarningFilled16, Close16, CvWrapper },
-  mixins: [uidMixin, carbonPrefixMixin, methodsMixin({ focusTarget: ['blur', 'focus'] })],
+  components: {
+    CvFormItem,
+    CheckmarkFilled16,
+    WarningFilled16,
+    Close16,
+    CvWrapper,
+  },
+  mixins: [
+    uidMixin,
+    carbonPrefixMixin,
+    methodsMixin({ focusTarget: ['blur', 'focus'] }),
+  ],
   inheritAttrs: false,
+  model: {
+    prop: 'files',
+    event: 'change',
+  },
   props: {
     clearOnReselect: Boolean,
     files: Array,
     kind: {
       type: String,
       default: 'drag-target',
-      validator: val => {
+      validator: (val) => {
         const validValues = Object.values(KINDS);
 
         if (!validValues.includes(val)) {
-          console.warn(`CvFileUploader: valid values for 'kind' are ${validValues}`);
+          console.warn(
+            `CvFileUploader: valid values for 'kind' are ${validValues}`
+          );
         }
         return true;
       },
@@ -145,9 +193,11 @@ export default {
     buttonLabel: {
       type: String,
       default: undefined,
-      validator: val => {
+      validator: (val) => {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('CvFileUploader: button-label prop deprecated in favour of drop-target-label');
+          console.warn(
+            'CvFileUploader: button-label prop deprecated in favour of drop-target-label'
+          );
         }
         return true;
       },
@@ -155,26 +205,11 @@ export default {
     dropTargetLabel: { type: String, default: undefined },
     removeAriaLabel: { type: String, default: 'Remove selected file' },
   },
-  model: {
-    prop: 'files',
-    event: 'change',
-  },
-  created() {
-    this.STATES = Object.freeze(STATES);
-  },
   data() {
     return {
       internalFiles: [],
       allowDrop: false,
     };
-  },
-  mounted() {
-    this.internalFiles = this.files ? this.files : [];
-  },
-  watch: {
-    files() {
-      this.internalFiles = this.files ? this.files : [];
-    },
   },
   computed: {
     // Bind listeners at the component level to the embedded input element and
@@ -183,25 +218,44 @@ export default {
     inputListeners() {
       return {
         ...this.$listeners,
-        change: event => this.onChange(event),
+        change: (event) => this.onChange(event),
       };
     },
     isInvalid() {
-      return index => {
-        const result = this.internalFiles[index].invalidMessage && this.internalFiles[index].invalidMessage.length;
+      return (index) => {
+        const result =
+          this.internalFiles[index].invalidMessage &&
+          this.internalFiles[index].invalidMessage.length;
         return result;
       };
     },
     internalDropTargetLabel() {
-      return this.dropTargetLabel || this.buttonLabel || 'Drag and drop files here or upload';
+      return (
+        this.dropTargetLabel ||
+        this.buttonLabel ||
+        'Drag and drop files here or upload'
+      );
     },
     stateStyleOverides() {
       // <style carbon tweaks - DO NOT USE STYLE TAG as it causes SSR issues
       return { display: 'inline-flex', alignItems: 'center' };
     },
     allowDropClass() {
-      return this.allowDrop ? ` ${this.carbonPrefix}--file__drop-container--drag-over` : '';
+      return this.allowDrop
+        ? ` ${this.carbonPrefix}--file__drop-container--drag-over`
+        : '';
     },
+  },
+  watch: {
+    files() {
+      this.internalFiles = this.files ? this.files : [];
+    },
+  },
+  created() {
+    this.STATES = Object.freeze(STATES);
+  },
+  mounted() {
+    this.internalFiles = this.files ? this.files : [];
   },
   methods: {
     remove(index) {

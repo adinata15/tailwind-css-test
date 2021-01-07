@@ -1,7 +1,10 @@
 <template>
   <tr
     class="cv-data-table-row-inner"
-    :class="{ [`${carbonPrefix}--parent-row`]: expandingRow, [`${carbonPrefix}--expandable-row`]: dataExpanded }"
+    :class="{
+      [`${carbonPrefix}--parent-row`]: expandingRow,
+      [`${carbonPrefix}--expandable-row`]: dataExpanded,
+    }"
   >
     <td
       v-if="dataSomeExpandingRows"
@@ -11,22 +14,27 @@
       <button
         v-if="expandingRow"
         :class="`${carbonPrefix}--table-expand__button`"
-        @click="toggleExpand"
         type="button"
         :aria-label="dataExpanded ? ariaLabelCollapseRow : ariaLabelExpandRow"
+        @click="toggleExpand"
       >
         <ChevronRight16 :class="`${carbonPrefix}--table-expand__svg`" />
       </button>
     </td>
-    <td v-if="hasBatchActions" :class="`${carbonPrefix}--table-column-checkbox`">
+    <td
+      v-if="hasBatchActions"
+      :class="`${carbonPrefix}--table-column-checkbox`"
+    >
       <cv-checkbox
+        ref="rowChecked"
+        v-model="dataChecked"
         :form-item="false"
         :value="value"
-        v-model="dataChecked"
+        :label="
+          ariaLabelForBatchCheckbox || `Select row ${value} for batch action`
+        "
+        hide-label
         @change="onChange"
-        ref="rowChecked"
-        :label="ariaLabelForBatchCheckbox || `Select row ${value} for batch action`"
-        hideLabel
       />
     </td>
     <slot />
@@ -58,8 +66,17 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvDataTableRowInner',
+  components: {
+    CvCheckbox,
+    CvOverflowMenu,
+    CvOverflowMenuItem,
+    ChevronRight16,
+  },
   mixins: [carbonPrefixMixin],
-  components: { CvCheckbox, CvOverflowMenu, CvOverflowMenuItem, ChevronRight16 },
+  model: {
+    event: 'change',
+    prop: 'checked',
+  },
   props: {
     ariaLabelForBatchCheckbox: String,
     checked: Boolean,
@@ -71,10 +88,6 @@ export default {
     someExpandingRows: Boolean,
     value: String,
   },
-  model: {
-    event: 'change',
-    prop: 'checked',
-  },
   data() {
     return {
       dataChecked: this.checked,
@@ -82,23 +95,6 @@ export default {
       dataSomeExpandingRows: this.someExpandingRows,
       hasOverflowMenu: false,
     };
-  },
-  mounted() {
-    this.checkSlots();
-  },
-  updated() {
-    this.checkSlots();
-  },
-  watch: {
-    checked() {
-      this.dataChecked = this.checked;
-    },
-    expanded() {
-      this.dataExpanded = this.expanded;
-    },
-    someExpandingRows() {
-      this.dataSomeExpandingRows = this.someExpandingRows;
-    },
   },
   computed: {
     isCvDataTableRow() {
@@ -111,18 +107,43 @@ export default {
       return this.dataChecked;
     },
     overflowMenuButtons() {
-      return this.overflowMenu.filter(item => typeof item === 'string');
+      return this.overflowMenu.filter((item) => typeof item === 'string');
     },
     overflowMenuOptions() {
-      const incomingOptions = this.overflowMenu.find(item => typeof item === 'object') || {};
-      const defaultOptions = { flipMenu: true, label: 'Row overflow menu', tipPosition: 'left' };
+      const incomingOptions =
+        this.overflowMenu.find((item) => typeof item === 'object') || {};
+      const defaultOptions = {
+        flipMenu: true,
+        label: 'Row overflow menu',
+        tipPosition: 'left',
+      };
       return { ...defaultOptions, ...incomingOptions };
     },
+  },
+  watch: {
+    checked() {
+      this.dataChecked = this.checked;
+    },
+    expanded() {
+      this.dataExpanded = this.expanded;
+    },
+    someExpandingRows() {
+      this.dataSomeExpandingRows = this.someExpandingRows;
+    },
+  },
+  mounted() {
+    this.checkSlots();
+  },
+  updated() {
+    this.checkSlots();
   },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.hasOverflowMenu = !!((this.overflowMenu && this.overflowMenu.length) || this.$slots['overflow-menu']);
+      this.hasOverflowMenu = !!(
+        (this.overflowMenu && this.overflowMenu.length) ||
+        this.$slots['overflow-menu']
+      );
     },
     onChange() {
       this.$parent.$parent.onRowCheckChange(this.value, this.dataChecked);

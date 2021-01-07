@@ -29,7 +29,9 @@
       :class="`${carbonPrefix}--snippet-btn--expand`"
       @click="toggleExpand"
     >
-      <span :class="`${carbonPrefix}--snippet-btn--text`">{{ expandButtonText }}</span>
+      <span :class="`${carbonPrefix}--snippet-btn--text`">{{
+        expandButtonText
+      }}</span>
       <ChevronDown16 :class="`${carbonPrefix}--icon-chevron--down`" />
     </cv-button>
   </div>
@@ -45,13 +47,13 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvCodeSnippetMultiline',
-  mixins: [carbonPrefixMixin],
   components: {
     CvButton,
     CvFeedbackButton,
     Copy16,
     ChevronDown16,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     copyFeedback: String,
     feedbackAriaLabel: String,

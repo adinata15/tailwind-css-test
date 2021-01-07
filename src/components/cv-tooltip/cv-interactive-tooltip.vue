@@ -4,12 +4,12 @@
       <slot name="label"></slot>
 
       <button
+        ref="trigger"
         :aria-expanded="dataVisible ? 'true' : 'false'"
         :aria-labelledby="`${uid}-label`"
         :class="`${carbonPrefix}--tooltip__trigger`"
         :aria-controls="`${uid}`"
         aria-haspopup="true"
-        ref="trigger"
         type="button"
         @click="toggle"
         @keydown.tab="onTriggerTab"
@@ -23,23 +23,26 @@
 
     <div
       :id="uid"
+      ref="popup"
       aria-hidden="true"
       :data-floating-menu-direction="direction"
-      :class="[`${carbonPrefix}--tooltip`, { [`${carbonPrefix}--tooltip--shown`]: dataVisible }]"
-      ref="popup"
+      :class="[
+        `${carbonPrefix}--tooltip`,
+        { [`${carbonPrefix}--tooltip--shown`]: dataVisible },
+      ]"
       role="dialog"
       :aria-describedby="`${uid}-body`"
       :aria-labelledby="`${uid}-label`"
-      @focusout="checkFocusOut"
       :style="{ left: left + 'px', top: top + 'px' }"
       tabindex="-1"
+      @focusout="checkFocusOut"
       @mousedown.prevent="preventFocusOut"
     >
       <div
-        class="cv-interactive-tooltip__before-content"
         ref="beforeContent"
+        class="cv-interactive-tooltip__before-content"
         tabindex="0"
-        style="position: absolute; height: 1px; width: 1px; left: -9999px;"
+        style="position: absolute; height: 1px; width: 1px; left: -9999px"
         @focus="focusBeforeContent"
       />
       <span :class="`${carbonPrefix}--tooltip__caret`"></span>
@@ -47,10 +50,10 @@
         <slot name="content"></slot>
       </div>
       <div
-        class="cv-interactive-tooltip__after-content"
         ref="afterContent"
+        class="cv-interactive-tooltip__after-content"
         tabindex="0"
-        style="position: absolute; height: 1px; width: 1px; left: -9999px;"
+        style="position: absolute; height: 1px; width: 1px; left: -9999px"
         @focus="focusAfterContent"
       />
     </div>
@@ -63,8 +66,8 @@ import Information16 from '@carbon/icons-vue/es/information/16';
 
 export default {
   name: 'CvInteractiveTooltip',
-  mixins: [uidMixin, carbonPrefixMixin],
   components: { Information16 },
+  mixins: [uidMixin, carbonPrefixMixin],
   props: {
     direction: {
       type: String,
@@ -73,7 +76,9 @@ export default {
         const validValues = ['top', 'bottom', 'right', 'left'];
         const valid = validValues.includes(val);
         if (!valid) {
-          console.warn(`CVInteractiveTooltip.direction must be one of the following: ${validValues}`);
+          console.warn(
+            `CVInteractiveTooltip.direction must be one of the following: ${validValues}`
+          );
         }
         return valid;
       },
@@ -106,6 +111,23 @@ export default {
       }
     },
   },
+  mounted() {
+    // move popup out to body to ensure it appears above other elements
+    this.popupEl = document.body.appendChild(this.$refs.popup);
+
+    if (this.visible) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  },
+  beforeDestroy() {
+    this.positionListen(false);
+    if (this.popupEl) {
+      // move back to where it came from
+      this.$el.appendChild(this.popupEl);
+    }
+  },
   methods: {
     positionListen(on) {
       if (on) {
@@ -131,15 +153,26 @@ export default {
         if (this.direction === 'bottom') {
           this.top = menuPosition.bottom + 10 + pixelsScrolledY;
         } else {
-          this.top = menuPosition.top - 15 - this.$refs.popup.offsetHeight + pixelsScrolledY;
+          this.top =
+            menuPosition.top -
+            15 -
+            this.$refs.popup.offsetHeight +
+            pixelsScrolledY;
         }
       } else {
         this.top =
           menuPosition.top +
-          (this.$refs.trigger.offsetHeight - 0.5 - this.$refs.popup.offsetHeight) / 2 +
+          (this.$refs.trigger.offsetHeight -
+            0.5 -
+            this.$refs.popup.offsetHeight) /
+            2 +
           pixelsScrolledY;
         if (this.direction === 'left') {
-          this.left = menuPosition.left - 10 - this.$refs.popup.offsetWidth + pixelsScrolledX;
+          this.left =
+            menuPosition.left -
+            10 -
+            this.$refs.popup.offsetWidth +
+            pixelsScrolledX;
         } else {
           this.left = menuPosition.right + 15 + pixelsScrolledX;
         }
@@ -179,7 +212,9 @@ export default {
       }
     },
     checkFocusOut(ev) {
-      this.dataVisible = ev.relatedTarget === this.$refs.trigger || this.$refs.popup.contains(ev.relatedTarget);
+      this.dataVisible =
+        ev.relatedTarget === this.$refs.trigger ||
+        this.$refs.popup.contains(ev.relatedTarget);
     },
     focusBeforeContent(ev) {
       if (this.contentAfter) {
@@ -204,23 +239,6 @@ export default {
     preventFocusOut() {
       // This is here to prevent focus being lost if the user clicks on the contents of the interactive tool tip
     },
-  },
-  mounted() {
-    // move popup out to body to ensure it appears above other elements
-    this.popupEl = document.body.appendChild(this.$refs.popup);
-
-    if (this.visible) {
-      this.show();
-    } else {
-      this.hide();
-    }
-  },
-  beforeDestroy() {
-    this.positionListen(false);
-    if (this.popupEl) {
-      // move back to where it came from
-      this.$el.appendChild(this.popupEl);
-    }
   },
 };
 </script>

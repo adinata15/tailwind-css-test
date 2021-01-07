@@ -1,7 +1,7 @@
 <template>
   <div
-    class="cv-tab"
     :id="uid"
+    class="cv-tab"
     role="tabpanel"
     :aria-labelledby="`${uid}-link`"
     :aria-hidden="!dataSelected ? 'true' : 'false'"
@@ -29,6 +29,19 @@ export default {
       dataSelected: this.selected,
     };
   },
+  computed: {
+    internalSelected: {
+      get() {
+        return this.dataSelected;
+      },
+      set(val) {
+        this.dataSelected = val;
+      },
+    },
+    internalDisabled() {
+      return this.disabled;
+    },
+  },
   watch: {
     selected() {
       if (this.selected) {
@@ -41,19 +54,6 @@ export default {
       } else {
         this.$parent.$emit('cv:enabled', this);
       }
-    },
-  },
-  computed: {
-    internalSelected: {
-      get() {
-        return this.dataSelected;
-      },
-      set(val) {
-        this.dataSelected = val;
-      },
-    },
-    internalDisabled() {
-      return this.disabled;
     },
   },
   mounted() {

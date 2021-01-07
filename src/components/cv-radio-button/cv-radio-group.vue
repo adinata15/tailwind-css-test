@@ -1,7 +1,10 @@
 <template>
   <div :class="`cv-radio-group ${carbonPrefix}--form-item`">
     <div
-      :class="[`${carbonPrefix}--radio-button-group`, { [`${carbonPrefix}--radio-button-group--vertical`]: vertical }]"
+      :class="[
+        `${carbonPrefix}--radio-button-group`,
+        { [`${carbonPrefix}--radio-button-group--vertical`]: vertical },
+      ]"
     >
       <slot></slot>
     </div>
@@ -18,7 +21,7 @@ export default {
   },
   mounted() {
     // pass on cv-radio-button change events
-    this.$on('cv:change', val => this.$emit('change', val));
+    this.$on('cv:change', (val) => this.$emit('change', val));
   },
 };
 </script>

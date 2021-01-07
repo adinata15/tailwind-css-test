@@ -1,5 +1,10 @@
 <template>
-  <div :class="[`${carbonPrefix}--side-nav__icon`, { [`${carbonPrefix}--side-nav__icon--small`]: small }]">
+  <div
+    :class="[
+      `${carbonPrefix}--side-nav__icon`,
+      { [`${carbonPrefix}--side-nav__icon--small`]: small },
+    ]"
+  >
     <slot />
   </div>
 </template>

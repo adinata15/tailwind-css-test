@@ -2,10 +2,10 @@
   <component
     :is="tagType"
     v-bind="$attrs"
-    v-on="$listeners"
     class="cv-structured-list-item"
     :value="value"
-    :modelValue="modelValue"
+    :model-value="modelValue"
+    v-on="$listeners"
   >
     <slot></slot>
   </component>
@@ -17,30 +17,32 @@ import CvStructuredListItemSelectable from './_cv-structured-list-item-selectabl
 
 export default {
   name: 'CvStructuredListItem',
-  inheritAttrs: false,
   components: { CvStructuredListItemStandard, CvStructuredListItemSelectable },
+  inheritAttrs: false,
+  model: {
+    prop: 'modelValue',
+    event: 'change',
+  },
   props: {
     value: { type: String, default: '' },
     modelValue: { type: String },
   },
-  mounted() {
-    // pass on cv-structured-list-item-selectable change events
-    this.$on('cv:change', val => {
-      this.$parent.$emit('cv:change', this.value); // emit to parent
-      this.$emit('change', val);
-    });
-  },
   computed: {
     tagType() {
-      return this.selectable ? 'cv-structured-list-item-selectable' : 'cv-structured-list-item-standard';
+      return this.selectable
+        ? 'cv-structured-list-item-selectable'
+        : 'cv-structured-list-item-standard';
     },
     selectable() {
       return this.$parent.selectable;
     },
   },
-  model: {
-    prop: 'modelValue',
-    event: 'change',
+  mounted() {
+    // pass on cv-structured-list-item-selectable change events
+    this.$on('cv:change', (val) => {
+      this.$parent.$emit('cv:change', this.value); // emit to parent
+      this.$emit('change', val);
+    });
   },
 };
 </script>

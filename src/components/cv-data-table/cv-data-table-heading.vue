@@ -1,26 +1,35 @@
 <template>
-  <th :aria-sort="internalOrder" :style="skeleton && headingStyle" :id="uid">
+  <th :id="uid" :aria-sort="internalOrder" :style="skeleton && headingStyle">
     <button
-      type="button"
       v-if="sortable"
+      type="button"
       :class="[
         `${carbonPrefix}--table-sort`,
         {
-          [`${carbonPrefix}--table-sort--active`]: this.internalOrder === 'descending',
+          [`${carbonPrefix}--table-sort--active`]:
+            this.internalOrder === 'descending',
           [`${carbonPrefix}--table-sort--active ${carbonPrefix}--table-sort--ascending`]:
             this.internalOrder === 'ascending',
         },
       ]"
-      @click="onSortClick"
       :style="headingStyle"
+      @click="onSortClick"
     >
-      <cv-wrapper :tag-type="headingLabelTag" :class="`${carbonPrefix}--table-header-label`">
+      <cv-wrapper
+        :tag-type="headingLabelTag"
+        :class="`${carbonPrefix}--table-header-label`"
+      >
         <slot>{{ heading }}</slot>
       </cv-wrapper>
       <ArrowDown16 :class="`${carbonPrefix}--table-sort__icon`" />
       <Arrows16 :class="`${carbonPrefix}--table-sort__icon-unsorted`" />
     </button>
-    <cv-wrapper v-else :tag-type="headingLabelTag" :class="`${carbonPrefix}--table-header-label`" :style="headingStyle">
+    <cv-wrapper
+      v-else
+      :tag-type="headingLabelTag"
+      :class="`${carbonPrefix}--table-header-label`"
+      :style="headingStyle"
+    >
       <slot>{{ heading }}</slot>
     </cv-wrapper>
   </th>
@@ -42,6 +51,10 @@ export default {
   name: 'CvDataTableHeading',
   components: { ArrowDown16, Arrows16, CvWrapper },
   mixins: [uidMixin, carbonPrefixMixin],
+  model: {
+    event: 'sort',
+    prop: 'order',
+  },
   props: {
     dataStyle: Object,
     heading: String,
@@ -54,18 +67,6 @@ export default {
     return {
       dataOrder: this.order,
     };
-  },
-  mounted() {
-    this.$_CvDataTableHeading = true; // for use by parent with $children
-    this.$parent.$emit('cv:mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:beforeDestroy', this);
-  },
-  watch: {
-    order() {
-      this.dataOrder = this.order;
-    },
   },
   computed: {
     internalOrder: {
@@ -89,12 +90,22 @@ export default {
     },
     headingLabelTag() {
       // no tag if non-blank skeleton
-      return this.skeleton && this.heading && this.heading.length > 0 ? '' : 'span';
+      return this.skeleton && this.heading && this.heading.length > 0
+        ? ''
+        : 'span';
     },
   },
-  model: {
-    event: 'sort',
-    prop: 'order',
+  watch: {
+    order() {
+      this.dataOrder = this.order;
+    },
+  },
+  mounted() {
+    this.$_CvDataTableHeading = true; // for use by parent with $children
+    this.$parent.$emit('cv:mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:beforeDestroy', this);
   },
   methods: {
     onSortClick() {

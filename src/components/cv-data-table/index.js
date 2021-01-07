@@ -5,4 +5,11 @@ import CvDataTable from './cv-data-table';
 import CvDataTableHeading from './cv-data-table-heading';
 import CvDataTableSkeleton from './cv-data-table-skeleton';
 
-export { CvDataTable, CvDataTableRow, CvDataTableCell, CvDataTableAction, CvDataTableHeading, CvDataTableSkeleton };
+export {
+  CvDataTable,
+  CvDataTableRow,
+  CvDataTableCell,
+  CvDataTableAction,
+  CvDataTableHeading,
+  CvDataTableSkeleton,
+};

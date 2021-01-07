@@ -7,15 +7,21 @@
     data-copy-btn
     :class="{
       [`${carbonPrefix}--copy-btn`]: !inline,
-      [`${carbonPrefix}--copy-btn--animating`]: feedbackPhase && feedbackPhase !== feedbackPhases.DEFAULT,
-      [`${carbonPrefix}--copy-btn--fade-in`]: feedbackPhase && feedbackPhase === feedbackPhases.FADE_IN,
-      [`${carbonPrefix}--copy-btn--fade-out`]: feedbackPhase && feedbackPhase === feedbackPhases.FADE_OUT,
+      [`${carbonPrefix}--copy-btn--animating`]:
+        feedbackPhase && feedbackPhase !== feedbackPhases.DEFAULT,
+      [`${carbonPrefix}--copy-btn--fade-in`]:
+        feedbackPhase && feedbackPhase === feedbackPhases.FADE_IN,
+      [`${carbonPrefix}--copy-btn--fade-out`]:
+        feedbackPhase && feedbackPhase === feedbackPhases.FADE_OUT,
     }"
     @click="onClick"
     @animationend="onAnimationEnd"
   >
     <slot></slot>
-    <span :class="`${carbonPrefix}--assistive-text ${carbonPrefix}--copy-btn__feedback`">{{ feedback }}</span>
+    <span
+      :class="`${carbonPrefix}--assistive-text ${carbonPrefix}--copy-btn__feedback`"
+      >{{ feedback }}</span
+    >
   </button>
 </template>
 
@@ -28,7 +34,7 @@ const feedbackPhases = {
   FADE_OUT: 3,
 };
 export default {
-  name: 'cvFeedbackButton',
+  name: 'CvFeedbackButton',
   mixins: [carbonPrefixMixin],
   inheritAttrs: false,
   props: {
@@ -37,13 +43,13 @@ export default {
     inline: Boolean,
     timeout: { type: Number, default: 2000 },
   },
-  created() {
-    this.feedbackPhases = feedbackPhases;
-  },
   data() {
     return {
       feedbackPhase: feedbackPhases.DEFAULT,
     };
+  },
+  created() {
+    this.feedbackPhases = feedbackPhases;
   },
   methods: {
     onClick() {

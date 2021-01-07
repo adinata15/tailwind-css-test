@@ -18,26 +18,27 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvAccordion',
+  mixins: [carbonPrefixMixin],
   props: {
-    align: { type: String, default: 'start', validator: val => ['start', 'end', ''].includes(val) },
+    align: {
+      type: String,
+      default: 'start',
+      validator: (val) => ['start', 'end', ''].includes(val),
+    },
     size: {
       type: String,
       default: '',
-      validator: val => ['sm', 'xl', ''].includes(val),
+      validator: (val) => ['sm', 'xl', ''].includes(val),
     },
-  },
-  mixins: [carbonPrefixMixin],
-  created() {
-    this.$on('cv:change', srcComponent => this.onCvChange(srcComponent));
   },
   computed: {
     state: {
       get() {
-        const items = this.$children.filter(item => item.$_CvAccordionItem);
-        return items.map(item => item.dataOpen);
+        const items = this.$children.filter((item) => item.$_CvAccordionItem);
+        return items.map((item) => item.dataOpen);
       },
       set(val) {
-        const items = this.$children.filter(item => item.$_CvAccordionItem);
+        const items = this.$children.filter((item) => item.$_CvAccordionItem);
 
         if (items.length > 0) {
           // loop through all items setting
@@ -49,9 +50,14 @@ export default {
       },
     },
   },
+  created() {
+    this.$on('cv:change', (srcComponent) => this.onCvChange(srcComponent));
+  },
   methods: {
     onCvChange(srcComponent) {
-      const index = this.$children.findIndex(item => item.uid === srcComponent.uid);
+      const index = this.$children.findIndex(
+        (item) => item.uid === srcComponent.uid
+      );
       this.$emit('change', { changedIndex: index, state: this.state });
     },
   },

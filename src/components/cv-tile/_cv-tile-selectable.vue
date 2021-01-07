@@ -1,5 +1,6 @@
 <template>
   <label
+    ref="target"
     :data-wibble="`${isChecked}`"
     :for="uid"
     :aria-label="ariaLabel"
@@ -10,12 +11,11 @@
     data-tile="selectable"
     tabindex="0"
     :data-contained-checkbox-state="isChecked"
-    ref="target"
   >
     <input
+      :id="uid"
       tabindex="-1"
       data-tile-input
-      :id="uid"
       type="checkbox"
       :checked="isChecked"
       :class="`${carbonPrefix}--tile-input`"
@@ -34,12 +34,22 @@
 </template>
 
 <script>
-import { uidMixin, checkMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  uidMixin,
+  checkMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 import CheckmarkFilled16 from '@carbon/icons-vue/es/checkmark--filled/16';
 
 export default {
   name: 'CvTileSelectable',
-  mixins: [uidMixin, checkMixin, carbonPrefixMixin, methodsMixin({ target: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    checkMixin,
+    carbonPrefixMixin,
+    methodsMixin({ target: ['blur', 'focus'] }),
+  ],
   components: { CheckmarkFilled16 },
   inheritAttrs: false,
   props: {

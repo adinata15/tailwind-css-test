@@ -11,13 +11,13 @@
     <slot></slot>
     <input
       v-bind="$attrs"
-      v-on="inputListeners"
-      tabindex="-1"
       :id="uid"
+      tabindex="-1"
       :class="`${carbonPrefix}--structured-list-input`"
       :checked="isChecked"
       :value="value"
       type="radio"
+      v-on="inputListeners"
     />
     <div :class="`${carbonPrefix}--structured-list-td`">
       <CheckmarkFilled16 :class="`${carbonPrefix}--structured-list-svg`" />
@@ -31,7 +31,7 @@ import CheckmarkFilled16 from '@carbon/icons-vue/es/checkmark--filled/16';
 export default {
   name: 'CvStructuredListItemSelectable',
   components: { CheckmarkFilled16 },
-  inheritAttrs: false,
   mixins: [uidMixin, radioMixin, carbonPrefixMixin],
+  inheritAttrs: false,
 };
 </script>

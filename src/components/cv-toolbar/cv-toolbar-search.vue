@@ -4,11 +4,11 @@
     class="cv-toolbar-search"
     :form-item="false"
     v-bind="$attrs"
+    :value="value"
+    small
     v-on="$listeners"
     @focus="onFocus"
     @blur="onBlur"
-    :value="value"
-    small
   ></cv-search>
 </template>
 
@@ -18,10 +18,10 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvToolbarSearch',
-  mixins: [carbonPrefixMixin],
   components: {
     CvSearch,
   },
+  mixins: [carbonPrefixMixin],
   inheritAttrs: false,
   props: {
     value: String,
@@ -29,7 +29,9 @@ export default {
   methods: {
     onBlur(ev) {
       if (!this.$el.contains(ev.target)) {
-        this.$el.classList.remove(`${this.carbonPrefix}--toolbar-search--active`);
+        this.$el.classList.remove(
+          `${this.carbonPrefix}--toolbar-search--active`
+        );
       }
     },
     onFocus() {

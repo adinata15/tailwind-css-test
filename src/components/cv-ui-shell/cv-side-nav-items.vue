@@ -1,5 +1,8 @@
 <template>
-  <ul :class="`cv-side-nav-items ${carbonPrefix}--side-nav__items`" @mousedown="onMousedown">
+  <ul
+    :class="`cv-side-nav-items ${carbonPrefix}--side-nav__items`"
+    @mousedown="onMousedown"
+  >
     <slot />
   </ul>
 </template>

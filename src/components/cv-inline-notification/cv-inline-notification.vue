@@ -9,20 +9,27 @@
         [`${carbonPrefix}--inline-notification--low-contrast`]: lowContrast,
       },
     ]"
-    v-on="$listeners"
     :role="isAlert ? 'alert' : false"
     :aria-live="!isAlert ? 'polite' : false"
+    v-on="$listeners"
   >
     <div :class="`${carbonPrefix}--inline-notification__details`">
-      <component :is="icon" :class="`${carbonPrefix}--inline-notification__icon`" />
+      <component
+        :is="icon"
+        :class="`${carbonPrefix}--inline-notification__icon`"
+      />
       <div :class="`${carbonPrefix}--inline-notification__text-wrapper`">
-        <p :class="`${carbonPrefix}--inline-notification__title`">{{ title }}</p>
-        <p :class="`${carbonPrefix}--inline-notification__subtitle`" v-html="subTitle"></p>
+        <p :class="`${carbonPrefix}--inline-notification__title`">
+          {{ title }}
+        </p>
+        <p
+          :class="`${carbonPrefix}--inline-notification__subtitle`"
+          v-html="subTitle"
+        ></p>
       </div>
     </div>
     <button
       v-if="actionLabel"
-      @click="$emit('action')"
       :class="[
         `${carbonPrefix}--inline-notification__action-button`,
         `${carbonPrefix}--btn`,
@@ -30,6 +37,7 @@
         `${carbonPrefix}--btn--ghost`,
       ]"
       type="button"
+      @click="$emit('action')"
     >
       {{ actionLabel }}
     </button>
@@ -63,7 +71,7 @@ export default {
     kind: {
       type: String,
       default: 'info',
-      validator: val => ['error', 'info', 'warning', 'success'].includes(val),
+      validator: (val) => ['error', 'info', 'warning', 'success'].includes(val),
     },
     lowContrast: Boolean,
   },

@@ -2,13 +2,13 @@
   <li :class="`${carbonPrefix}--side-nav__item`">
     <component
       :is="tagType"
-      v-on="$listeners"
       :class="[
         'cv-side-nav-item-link',
         `${carbonPrefix}--side-nav__link`,
         { [`${carbonPrefix}--side-nav__link--current`]: active },
       ]"
       v-bind="{ ...$attrs, ...linkProps }"
+      v-on="$listeners"
     >
       <cv-side-nav-icon v-if="hasNavIcon" small>
         <slot name="nav-icon" />
@@ -27,9 +27,9 @@ import CvSideNavLinkText from './_cv-side-nav-link-text';
 
 export default {
   name: 'CvSideNavLink',
-  inheritAttrs: false,
-  mixins: [linkMixin, carbonPrefixMixin],
   components: { CvSideNavIcon, CvSideNavLinkText },
+  mixins: [linkMixin, carbonPrefixMixin],
+  inheritAttrs: false,
   props: {
     active: Boolean,
     icon: Object,

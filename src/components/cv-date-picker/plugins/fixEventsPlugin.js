@@ -11,20 +11,24 @@
 
 /**
  * @param {object} config Plugin configuration.
- * @returns {Plugin} A Flatpickr plugin to fix Flatpickr's behavior of certain events.
+ * @return {Plugin} A Flatpickr plugin to fix Flatpickr's behavior of certain events.
  */
-export default config => fp => {
+export default (config) => (fp) => {
   /**
    * Handles `keydown` event.
    */
-  const handleKeydown = event => {
+  const handleKeydown = (event) => {
     const { inputFrom, inputTo } = config;
     const { target } = event;
     if (inputFrom === target || inputTo === target) {
       if (event.key === 'Enter') {
         // Makes sure the hitting enter key picks up pending values of both `<input>`
         // Workaround for: https://github.com/flatpickr/flatpickr/issues/1942
-        fp.setDate([inputFrom.value, inputTo && inputTo.value], true, fp.config.dateFormat);
+        fp.setDate(
+          [inputFrom.value, inputTo && inputTo.value],
+          true,
+          fp.config.dateFormat
+        );
         event.stopPropagation();
       } else if (event.key === 'Left' || event.key === 'Right') {
         // Prevents Flatpickr code from canceling the event if left/right arrow keys are hit on `<input>`,

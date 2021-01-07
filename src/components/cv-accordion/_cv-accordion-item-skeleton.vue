@@ -1,8 +1,19 @@
 <template>
-  <li :class="[`${carbonPrefix}--accordion__item`, { [`${carbonPrefix}--accordion__item--active`]: open }]">
-    <button disabled type="button" :class="`${carbonPrefix}--accordion__heading`">
+  <li
+    :class="[
+      `${carbonPrefix}--accordion__item`,
+      { [`${carbonPrefix}--accordion__item--active`]: open },
+    ]"
+  >
+    <button
+      disabled
+      type="button"
+      :class="`${carbonPrefix}--accordion__heading`"
+    >
       <ChevronRight16 :class="`${carbonPrefix}--accordion__arrow`" />
-      <cv-skeleton-text :class="`${carbonPrefix}--accordion__title`"></cv-skeleton-text>
+      <cv-skeleton-text
+        :class="`${carbonPrefix}--accordion__title`"
+      ></cv-skeleton-text>
     </button>
     <div :class="`${carbonPrefix}--accordion__content`">
       <slot></slot>
@@ -17,11 +28,11 @@ import { carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvAccordionItemSkeleton',
-  mixins: [carbonPrefixMixin],
   components: {
     ChevronRight16,
     CvSkeletonText,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     open: { type: Boolean, default: false },
   },

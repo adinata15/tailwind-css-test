@@ -2,11 +2,14 @@
   <li class="cv-header-menu-item" :role="role">
     <component
       :is="tagType"
-      v-on="$listeners"
       v-bind="{ ...$attrs, ...linkProps }"
-      :class="[`${carbonPrefix}--header__menu-item`, { [`${carbonPrefix}--header__menu-item--current`]: activePage }]"
+      :class="[
+        `${carbonPrefix}--header__menu-item`,
+        { [`${carbonPrefix}--header__menu-item--current`]: activePage },
+      ]"
       role="menuitem"
       :aria-current="ariaCurrent"
+      v-on="$listeners"
     >
       <span :class="`${carbonPrefix}--text-truncate--end`">
         <slot />

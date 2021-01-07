@@ -1,5 +1,9 @@
 <template>
-  <cv-wrapper :tag-type="formItem ? 'div' : ''" class="cv-number-input" :class="`${carbonPrefix}--form-item`">
+  <cv-wrapper
+    :tag-type="formItem ? 'div' : ''"
+    class="cv-number-input"
+    :class="`${carbonPrefix}--form-item`"
+  >
     <div
       data-numberinput
       :class="[
@@ -14,49 +18,55 @@
       :data-invalid="isInvalid"
     >
       <label :for="uid" :class="`${carbonPrefix}--label`">{{ label }}</label>
-      <div :class="`${carbonPrefix}--form__helper-text`" v-if="isHelper && mobile">
+      <div
+        v-if="isHelper && mobile"
+        :class="`${carbonPrefix}--form__helper-text`"
+      >
         <slot name="helper-text">{{ helperText }}</slot>
       </div>
       <div :class="`${carbonPrefix}--number__input-wrapper`">
         <button
           v-if="mobile"
           :class="`${carbonPrefix}--number__control-btn down-icon`"
-          @click="doDown"
           type="button"
           :aria-label="ariaLabelForDownButton"
           :disabled="disabled"
+          @click="doDown"
         >
           <CaretDownGlyph />
         </button>
         <input
           :id="uid"
+          v-bind="$attrs"
+          ref="input"
           type="number"
           :value="internalValue"
-          v-bind="$attrs"
-          v-on="inputListeners"
           :disabled="disabled"
           :step="step"
           :min="min"
           :max="max"
-          ref="input"
+          v-on="inputListeners"
         />
-        <WarningFilled16 v-if="isInvalid && !mobile" :class="`${carbonPrefix}--number__invalid`" />
-        <div :class="`${carbonPrefix}--number__controls`" v-if="!mobile">
+        <WarningFilled16
+          v-if="isInvalid && !mobile"
+          :class="`${carbonPrefix}--number__invalid`"
+        />
+        <div v-if="!mobile" :class="`${carbonPrefix}--number__controls`">
           <button
             :class="`${carbonPrefix}--number__control-btn up-icon`"
-            @click="doUp"
             type="button"
             :aria-label="ariaLabelForUpButton"
             :disabled="disabled"
+            @click="doUp"
           >
             <CaretUpGlyph />
           </button>
           <button
             :class="`${carbonPrefix}--number__control-btn down-icon`"
-            @click="doDown"
             type="button"
             :aria-label="ariaLabelForDownButton"
             :disabled="disabled"
+            @click="doDown"
           >
             <CaretDownGlyph />
           </button>
@@ -64,18 +74,21 @@
         <button
           v-else
           :class="`${carbonPrefix}--number__control-btn up-icon`"
-          @click="doUp"
           type="button"
           :aria-label="ariaLabelForUpButton"
           :disabled="disabled"
+          @click="doUp"
         >
           <CaretUpGlyph />
         </button>
       </div>
-      <div :class="`${carbonPrefix}--form-requirement`" v-if="isInvalid">
+      <div v-if="isInvalid" :class="`${carbonPrefix}--form-requirement`">
         <slot name="invalid-message">{{ invalidMessage }}</slot>
       </div>
-      <div :class="`${carbonPrefix}--form__helper-text`" v-if="!isInvalid && isHelper && !mobile">
+      <div
+        v-if="!isInvalid && isHelper && !mobile"
+        :class="`${carbonPrefix}--form__helper-text`"
+      >
         <slot name="helper-text">{{ helperText }}</slot>
       </div>
     </div>
@@ -83,7 +96,12 @@
 </template>
 
 <script>
-import { uidMixin, themeMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
+import {
+  uidMixin,
+  themeMixin,
+  carbonPrefixMixin,
+  methodsMixin,
+} from '../../mixins';
 import CaretDownGlyph from '@carbon/icons-vue/es/caret--down/index';
 import CaretUpGlyph from '@carbon/icons-vue/es/caret--up/index';
 import WarningFilled16 from '@carbon/icons-vue/es/warning--filled/16';
@@ -91,7 +109,12 @@ import CvWrapper from '../cv-wrapper/_cv-wrapper';
 
 export default {
   name: 'CvNumberInput',
-  mixins: [uidMixin, themeMixin, carbonPrefixMixin, methodsMixin({ input: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    themeMixin,
+    carbonPrefixMixin,
+    methodsMixin({ input: ['blur', 'focus'] }),
+  ],
   components: { CaretDownGlyph, CaretUpGlyph, WarningFilled16, CvWrapper },
   inheritAttrs: false,
   props: {
@@ -106,7 +129,9 @@ export default {
       default: undefined,
       validator(val) {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('CvNumberInput: invalid prop deprecated in favour of invalidMessage');
+          console.warn(
+            'CvNumberInput: invalid prop deprecated in favour of invalidMessage'
+          );
         }
         return true;
       },
@@ -125,12 +150,15 @@ export default {
       isInvalid: false,
     };
   },
-  mounted() {
-    this.internalValue = this.valueAsString(this.value);
-    this.checkSlots();
-  },
-  updated() {
-    this.checkSlots();
+  computed: {
+    // Bind listeners at the component level to the embedded input element and
+    // add our own input listener to service the v-model. See:
+    // https://vuejs.org/v2/guide/components-custom-events.html#Customizing-Component-v-model
+    inputListeners() {
+      return Object.assign({}, this.$listeners, {
+        input: (ev) => this.onInput(ev.target.value),
+      });
+    },
   },
   watch: {
     value() {
@@ -143,15 +171,12 @@ export default {
       }
     },
   },
-  computed: {
-    // Bind listeners at the component level to the embedded input element and
-    // add our own input listener to service the v-model. See:
-    // https://vuejs.org/v2/guide/components-custom-events.html#Customizing-Component-v-model
-    inputListeners() {
-      return Object.assign({}, this.$listeners, {
-        input: ev => this.onInput(ev.target.value),
-      });
-    },
+  mounted() {
+    this.internalValue = this.valueAsString(this.value);
+    this.checkSlots();
+  },
+  updated() {
+    this.checkSlots();
   },
   methods: {
     onInput(val) {
@@ -160,8 +185,14 @@ export default {
     },
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
-      this.isInvalid = !!(this.$slots['invalid-message'] || (this.invalidMessage && this.invalidMessage.length));
-      this.isHelper = !!(this.$slots['helper-text'] || (this.helperText && this.helperText.length));
+      this.isInvalid = !!(
+        this.$slots['invalid-message'] ||
+        (this.invalidMessage && this.invalidMessage.length)
+      );
+      this.isHelper = !!(
+        this.$slots['helper-text'] ||
+        (this.helperText && this.helperText.length)
+      );
     },
     doUp() {
       this.$refs.input.stepUp();

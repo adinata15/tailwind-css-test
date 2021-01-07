@@ -1,10 +1,13 @@
 <template>
   <div :style="{ width: width }">
     <p
-      :class="[`${carbonPrefix}--skeleton__text`, { [`${carbonPrefix}--skeleton__heading`]: heading }]"
-      :style="{ width: line.width }"
-      :key="index"
       v-for="(line, index) in lines"
+      :key="index"
+      :class="[
+        `${carbonPrefix}--skeleton__text`,
+        { [`${carbonPrefix}--skeleton__heading`]: heading },
+      ]"
+      :style="{ width: line.width }"
     ></p>
   </div>
 </template>
@@ -19,24 +22,6 @@ export default {
     heading: { type: Boolean, default: false },
     lineCount: { type: Number, default: 3 },
     paragraph: { type: Boolean, default: false },
-  },
-  methods: {
-    getRandomInt: function(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-    calcWidth() {
-      let width = this.width;
-      if (this.paragraph) {
-        const { num, unit } = this.widthObj;
-        if (unit === '%') {
-          const randomWidth = this.getRandomInt(0, 75) + 'px';
-          width = `calc(${width} - ${randomWidth})`;
-        } else if (unit === 'px') {
-          width = this.getRandomInt(num - 75, num) + 'px';
-        }
-      }
-      return width;
-    },
   },
   computed: {
     widthObj() {
@@ -58,6 +43,24 @@ export default {
           width: this.calcWidth(),
         })
       );
+    },
+  },
+  methods: {
+    getRandomInt: function (min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    calcWidth() {
+      let width = this.width;
+      if (this.paragraph) {
+        const { num, unit } = this.widthObj;
+        if (unit === '%') {
+          const randomWidth = this.getRandomInt(0, 75) + 'px';
+          width = `calc(${width} - ${randomWidth})`;
+        } else if (unit === 'px') {
+          width = this.getRandomInt(num - 75, num) + 'px';
+        }
+      }
+      return width;
     },
   },
 };

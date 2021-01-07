@@ -6,15 +6,24 @@
       `${carbonPrefix}--toast-notification--${kind.toLowerCase()}`,
       { [`${carbonPrefix}--toast-notification--low-contrast`]: lowContrast },
     ]"
-    v-on="$listeners"
     :role="isAlert ? 'alert' : undefined"
     :aria-live="!isAlert ? 'polite' : false"
+    v-on="$listeners"
   >
-    <component :is="icon" :class="`${carbonPrefix}--toast-notification__icon`" />
+    <component
+      :is="icon"
+      :class="`${carbonPrefix}--toast-notification__icon`"
+    />
     <div :class="`${carbonPrefix}--toast-notification__details`">
       <h3 :class="`${carbonPrefix}--toast-notification__title`">{{ title }}</h3>
-      <p :class="`${carbonPrefix}--toast-notification__subtitle`" v-html="subTitle"></p>
-      <p :class="`${carbonPrefix}--toast-notification__caption`" v-html="caption"></p>
+      <p
+        :class="`${carbonPrefix}--toast-notification__subtitle`"
+        v-html="subTitle"
+      ></p>
+      <p
+        :class="`${carbonPrefix}--toast-notification__caption`"
+        v-html="caption"
+      ></p>
     </div>
     <button
       :aria-label="closeAriaLabel"
@@ -46,7 +55,7 @@ export default {
     kind: {
       type: String,
       default: 'info',
-      validator: val => ['error', 'info', 'warning', 'success'].includes(val),
+      validator: (val) => ['error', 'info', 'warning', 'success'].includes(val),
     },
     lowContrast: Boolean,
   },

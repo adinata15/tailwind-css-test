@@ -1,13 +1,13 @@
 <template>
   <component
     :is="tagType"
-    v-on="$listeners"
     v-bind="linkProps"
     :class="[
       `cv-switcher-item-link`,
       `${carbonPrefix}--switcher__item-link`,
       { [`${carbonPrefix}--switcher__item-link--selected`]: selected },
     ]"
+    v-on="$listeners"
   >
     <slot />
   </component>

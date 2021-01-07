@@ -15,7 +15,9 @@ export default {
       default: undefined,
       validator(val) {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('iconHref deprecated in favour of icon to be removed in future versions.');
+          console.warn(
+            'iconHref deprecated in favour of icon to be removed in future versions.'
+          );
         }
         return true;
       },
@@ -23,7 +25,16 @@ export default {
     kind: {
       type: String,
       default: 'primary',
-      validator: val => ['', 'primary', 'secondary', 'tertiary', 'ghost', 'danger', 'danger--primary'].includes(val),
+      validator: (val) =>
+        [
+          '',
+          'primary',
+          'secondary',
+          'tertiary',
+          'ghost',
+          'danger',
+          'danger--primary',
+        ].includes(val),
     },
     small: {
       type: Boolean,
@@ -38,18 +49,19 @@ export default {
     size: {
       type: String,
       default: undefined,
-      validator: val => ['', 'default', 'field', 'small', 'sm', 'lg', 'xl'].includes(val),
+      validator: (val) =>
+        ['', 'default', 'field', 'small', 'sm', 'lg', 'xl'].includes(val),
     },
   },
   computed: {
     inputListeners() {
       return Object.assign({}, this.$listeners, {
-        click: event => this.$emit('click', event),
+        click: (event) => this.$emit('click', event),
       });
     },
     buttonClassOpts() {
       return (opts = {}) => {
-        let classes = [`${carbonSettings.prefix}--btn`];
+        const classes = [`${carbonSettings.prefix}--btn`];
 
         if (opts.skeleton) {
           classes.push(`${carbonSettings.prefix}--skeleton`);
@@ -60,7 +72,9 @@ export default {
         }
 
         if (this.kind && !opts.skeleton) {
-          classes.push(`${carbonSettings.prefix}--btn--${this.kind.toLowerCase()}`);
+          classes.push(
+            `${carbonSettings.prefix}--btn--${this.kind.toLowerCase()}`
+          );
         }
 
         let size = this.size ? this.size : this.small && 'sm';

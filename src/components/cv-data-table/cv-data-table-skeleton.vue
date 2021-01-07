@@ -1,5 +1,11 @@
 <template>
-  <cv-data-table skeleton :data="data" :columns="cols" v-on="$listeners" v-bind="$attrs">
+  <cv-data-table
+    skeleton
+    :data="data"
+    :columns="cols"
+    v-bind="$attrs"
+    v-on="$listeners"
+  >
     <template v-if="hasBatchActions" slot="helper-text">
       <slot name="helper-text" />
     </template>
@@ -39,19 +45,23 @@ export default {
       hasBatchActions: false,
     };
   },
+  computed: {
+    data() {
+      return [...Array(Math.max(this.rows, 1))].map(() =>
+        Array(this.cols.length).fill('')
+      );
+    },
+    cols() {
+      return typeof this.columns !== 'number'
+        ? this.columns
+        : Array(Math.max(this.columns, 1)).fill('');
+    },
+  },
   mounted() {
     this.checkSlots();
   },
   updated() {
     this.checkSlots();
-  },
-  computed: {
-    data() {
-      return [...Array(Math.max(this.rows, 1))].map(() => Array(this.cols.length).fill(''));
-    },
-    cols() {
-      return typeof this.columns !== 'number' ? this.columns : Array(Math.max(this.columns, 1)).fill('');
-    },
   },
   methods: {
     checkSlots() {

@@ -1,5 +1,6 @@
 <template>
   <nav
+    :id="id"
     :class="[
       `cv-side-nav`,
       `${carbonPrefix}--side-nav`,
@@ -12,7 +13,6 @@
       },
     ]"
     :aria-hidden="!panelExpanded && !fixed ? 'true' : 'false'"
-    :id="id"
     @focusout="onFocusout"
     @mousedown="onMouseDown"
   >
@@ -20,7 +20,7 @@
     <cv-side-nav-footer
       v-if="!fixed && !rail && !headerEmbedded"
       :expanded="panelExpanded"
-      :assistiveText="assistiveToggleText"
+      :assistive-text="assistiveToggleText"
       @toggle-expand="toggleExpand"
     />
   </nav>
@@ -34,6 +34,10 @@ export default {
   name: 'CvSideNav',
   components: { CvSideNavFooter },
   mixins: [carbonPrefixMixin],
+  model: {
+    event: 'modelEvent',
+    prop: 'expanded',
+  },
   props: {
     expanded: Boolean,
     fixed: Boolean,
@@ -41,22 +45,11 @@ export default {
     assistiveToggleText: String,
     rail: Boolean,
   },
-  mounted() {
-    this.$parent.$emit('cv:panel-mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:panel-beforeDestroy', this);
-  },
   data() {
     return {
       dataExpanded: this.expanded,
       headerEmbedded: false,
     };
-  },
-  watch: {
-    expanded() {
-      this.panelExpanded = this.expanded;
-    },
   },
   computed: {
     isChildOfHeader() {
@@ -75,6 +68,17 @@ export default {
       },
     },
   },
+  watch: {
+    expanded() {
+      this.panelExpanded = this.expanded;
+    },
+  },
+  mounted() {
+    this.$parent.$emit('cv:panel-mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:panel-beforeDestroy', this);
+  },
   methods: {
     onFocusout(ev) {
       this.$parent.$emit('cv:panel-focusout', this, ev);
@@ -88,10 +92,6 @@ export default {
     toggleExpand() {
       this.panelExpanded = !this.dataExpanded;
     },
-  },
-  model: {
-    event: 'modelEvent',
-    prop: 'expanded',
   },
 };
 </script>

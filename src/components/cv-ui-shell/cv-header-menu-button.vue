@@ -1,6 +1,6 @@
 <template>
   <button
-    v-on="$listeners"
+    :id="uid"
     class="cv-header-menu-button"
     :class="[
       `${carbonPrefix}--header__action`,
@@ -15,9 +15,9 @@
     aria-haspopup="true"
     :aria-controls="ariaControls"
     :aria-expanded="active ? 'true' : 'false'"
+    v-on="$listeners"
     @click="gaToggle"
     @focusout="gaFocusout"
-    :id="uid"
   >
     <Close20 v-if="dataActive" />
     <Menu20 v-if="!dataActive" />
@@ -31,30 +31,17 @@ import Menu20 from '@carbon/icons-vue/es/menu/20';
 
 export default {
   name: 'CvHeaderMenuButton',
-  mixins: [uidMixin, carbonPrefixMixin],
   components: { Close20, Menu20 },
+  mixins: [uidMixin, carbonPrefixMixin],
   props: {
     active: Boolean,
     ariaControls: { type: String, required: true },
-  },
-  mounted() {
-    this.$parent.$emit('cv:panel-control-mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:panel-control-beforeDestroy', this);
   },
   data() {
     return {
       dataActive: this.active,
       hasRail: false,
     };
-  },
-  watch: {
-    active() {
-      if (this.active !== this.dataActive) {
-        this.gaToggle();
-      }
-    },
   },
   computed: {
     panelExpanded: {
@@ -66,6 +53,19 @@ export default {
         this.dataActive = val;
       },
     },
+  },
+  watch: {
+    active() {
+      if (this.active !== this.dataActive) {
+        this.gaToggle();
+      }
+    },
+  },
+  mounted() {
+    this.$parent.$emit('cv:panel-control-mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:panel-control-beforeDestroy', this);
   },
   methods: {
     gaToggle() {

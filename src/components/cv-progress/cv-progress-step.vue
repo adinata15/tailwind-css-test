@@ -13,7 +13,10 @@
     <svg v-if="isCurrent">
       <path d="M 7, 7 m -7, 0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
     </svg>
-    <Warning16 v-else-if="!isComplete && invalid" :class="`${carbonPrefix}--progress__warning`" />
+    <Warning16
+      v-else-if="!isComplete && invalid"
+      :class="`${carbonPrefix}--progress__warning`"
+    />
     <svg v-else-if="!isComplete">
       <path
         d="M8 1C4.1 1 1 4.1 1 8s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm0 13c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"
@@ -22,20 +25,29 @@
     <CheckmarkOutline16 v-else-if="isComplete" />
 
     <p
-      :class="[`${carbonPrefix}--progress-label`, { [`${carbonPrefix}--progress-label-overflow`]: showOverflow }]"
+      ref="label"
+      :class="[
+        `${carbonPrefix}--progress-label`,
+        { [`${carbonPrefix}--progress-label-overflow`]: showOverflow },
+      ]"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
-      ref="label"
     >
       {{ label }}
     </p>
 
-    <div role="tooltip" data-floating-menu-direction="bottom" :class="`${carbonPrefix}--tooltip`">
+    <div
+      role="tooltip"
+      data-floating-menu-direction="bottom"
+      :class="`${carbonPrefix}--tooltip`"
+    >
       <span :class="`${carbonPrefix}--tooltip__caret`"></span>
       <p :class="`${carbonPrefix}--tooltip__text`">{{ tip }}</p>
     </div>
 
-    <p :class="`${carbonPrefix}--progress-optional`" v-if="additionalInfo">{{ additionalInfo }}</p>
+    <p v-if="additionalInfo" :class="`${carbonPrefix}--progress-optional`">
+      {{ additionalInfo }}
+    </p>
     <span :class="`${carbonPrefix}--progress-line`"></span>
   </li>
 </template>
@@ -49,11 +61,11 @@ const states = ['incomplete', 'current', 'complete'];
 
 export default {
   name: 'CvProgressStep',
-  mixins: [carbonPrefixMixin],
   components: {
     CheckmarkOutline16,
     Warning16,
   },
+  mixins: [carbonPrefixMixin],
   props: {
     additionalInfo: String,
     disabled: Boolean,
@@ -68,18 +80,6 @@ export default {
       showOverflow: false,
       tip: '',
     };
-  },
-  mounted() {
-    this.$_CvProgressStep = true; // for use by parent with $children
-    this.$parent.$emit('cv:mounted');
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:beforeDestroy');
-  },
-  watch: {
-    complete() {
-      this.$parent.$emit('cv:completed');
-    },
   },
   computed: {
     internalState: {
@@ -99,6 +99,18 @@ export default {
     isCurrent() {
       return this.state === 0;
     },
+  },
+  watch: {
+    complete() {
+      this.$parent.$emit('cv:completed');
+    },
+  },
+  mounted() {
+    this.$_CvProgressStep = true; // for use by parent with $children
+    this.$parent.$emit('cv:mounted');
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:beforeDestroy');
   },
   methods: {
     onMouseEnter() {

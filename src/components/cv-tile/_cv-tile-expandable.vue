@@ -1,11 +1,11 @@
 <template>
   <div
+    ref="target"
     data-tile="expandable"
     :class="[
       `cv-tile-expandable ${carbonPrefix}--tile--expandable`,
       { [`${carbonPrefix}--tile--is-expanded`]: internalExpanded },
     ]"
-    ref="target"
     tabindex="0"
     :style="styleObject"
     @click="toggle"
@@ -17,15 +17,19 @@
       <ChevronDown16 />
     </button>
     <div :class="`${carbonPrefix}--tile-content`">
-      <span data-tile-atf :class="`${carbonPrefix}--tile-content__above-the-fold`" ref="aboveFold">
+      <span
+        ref="aboveFold"
+        data-tile-atf
+        :class="`${carbonPrefix}--tile-content__above-the-fold`"
+      >
         <slot>
           <!-- Above the fold content here -->
         </slot>
       </span>
       <span
-        :class="`${carbonPrefix}--tile-content__below-the-fold`"
-        ref="belowFold"
         v-show="internalExpanded || initialized"
+        ref="belowFold"
+        :class="`${carbonPrefix}--tile-content__below-the-fold`"
       >
         <slot name="below">
           <!-- Rest of the content here -->
@@ -72,9 +76,11 @@ export default {
 
       this.$nextTick(() => {
         const forceType = typeof force;
-        this.internalExpanded = forceType === 'boolean' ? force : !this.internalExpanded;
+        this.internalExpanded =
+          forceType === 'boolean' ? force : !this.internalExpanded;
 
-        const belowFoldHeight = this.$refs.belowFold.getBoundingClientRect().height;
+        const belowFoldHeight = this.$refs.belowFold.getBoundingClientRect()
+          .height;
 
         if (this.internalExpanded) {
           currentHeight += belowFoldHeight;

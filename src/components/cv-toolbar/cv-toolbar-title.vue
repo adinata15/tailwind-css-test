@@ -1,5 +1,7 @@
 <template>
-  <li :class="`cv-toolbar-title ${carbonPrefix}--toolbar-menu__title`">{{ title }}</li>
+  <li :class="`cv-toolbar-title ${carbonPrefix}--toolbar-menu__title`">
+    {{ title }}
+  </li>
 </template>
 
 <script>

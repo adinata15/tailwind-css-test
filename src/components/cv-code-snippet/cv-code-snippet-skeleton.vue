@@ -1,8 +1,8 @@
 <template>
   <div
-    :class="
-      `${carbonPrefix}--snippet ${carbonPrefix}--skeleton ${carbonPrefix}--snippet--${multi ? 'multi' : 'single'}`
-    "
+    :class="`${carbonPrefix}--snippet ${carbonPrefix}--skeleton ${carbonPrefix}--snippet--${
+      multi ? 'multi' : 'single'
+    }`"
   >
     <div :class="`${carbonPrefix}--snippet-container`">
       <span />

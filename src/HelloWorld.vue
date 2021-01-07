@@ -1,19 +1,21 @@
 <template>
-  <div class="font-sans text-blue-600">
+  <div class="font-sans welcome-msg">
     <h1>{{ msg }}</h1>
   </div>
 </template>
 
 <script>
-
-//import Button from "./components/w-button"
+// import Button from "./components/w-button"
 
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
-  }
-}
+    msg: {
+      type: String,
+      default: 'HelloWorld',
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

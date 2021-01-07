@@ -1,10 +1,13 @@
 <template>
   <component
     :is="tagType"
-    v-on="$listeners"
     v-bind="linkProps"
     class="cv-link"
-    :class="[`${carbonPrefix}--link`, { [`${carbonPrefix}--link--inline`]: inline }]"
+    :class="[
+      `${carbonPrefix}--link`,
+      { [`${carbonPrefix}--link--inline`]: inline },
+    ]"
+    v-on="$listeners"
   >
     <slot></slot>
   </component>

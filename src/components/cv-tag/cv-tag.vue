@@ -19,8 +19,8 @@
       v-if="isFilter"
       :class="`${carbonPrefix}--tag__close-icon`"
       :aria-label="clearAriaLabel"
-      @click.stop.prevent="onRemove"
       :disabled="disabled"
+      @click.stop.prevent="onRemove"
     >
       <Close16 />
     </button>
@@ -47,8 +47,8 @@ const tagKinds = [
 
 export default {
   name: 'CvTag',
-  mixins: [carbonPrefixMixin],
   components: { Close16 },
+  mixins: [carbonPrefixMixin],
   props: {
     clearAriaLabel: { type: String, default: 'Clear filter' },
     disabled: Boolean,

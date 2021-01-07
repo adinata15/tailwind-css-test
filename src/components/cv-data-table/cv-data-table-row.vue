@@ -1,13 +1,17 @@
 <template>
-  <tbody v-if="someExpandingRows" class="cv-data-table-row cv-data-table-row--expandable" :id="uid">
+  <tbody
+    v-if="someExpandingRows"
+    :id="uid"
+    class="cv-data-table-row cv-data-table-row--expandable"
+  >
     <cv-data-table-row-inner
       ref="row"
       v-bind="$attrs"
-      v-on="$listeners"
       :expanding-row="dataExpandable"
       some-expanding-rows
-      @expanded-change="onExpandedChange"
       :expanded="dataExpanded"
+      v-on="$listeners"
+      @expanded-change="onExpandedChange"
     >
       <slot />
     </cv-data-table-row-inner>
@@ -23,7 +27,14 @@
       </td>
     </tr>
   </tbody>
-  <cv-data-table-row-inner v-else ref="row" v-bind="$attrs" v-on="$listeners" class="cv-data-table-row" :id="uid">
+  <cv-data-table-row-inner
+    v-else
+    v-bind="$attrs"
+    :id="uid"
+    ref="row"
+    class="cv-data-table-row"
+    v-on="$listeners"
+  >
     <slot />
   </cv-data-table-row-inner>
 </template>
@@ -34,8 +45,8 @@ import { uidMixin, carbonPrefixMixin } from '../../mixins';
 
 export default {
   name: 'CvDataTableRow',
-  mixins: [uidMixin, carbonPrefixMixin],
   components: { CvDataTableRowInner },
+  mixins: [uidMixin, carbonPrefixMixin],
   props: {
     expanded: Boolean,
   },
@@ -45,24 +56,6 @@ export default {
       dataSomeExpandingRows: false,
       dataExpanded: this.expanded,
     };
-  },
-  watch: {
-    expanded() {
-      if (this.dataExpanded !== this.expaned) {
-        this.dataExpanded = this.expanded;
-      }
-    },
-  },
-  mounted() {
-    // NOTE: this.$slots is not reactive so needs to be managed on updated
-    this.dataExpandable = !!this.$slots.expandedContent;
-    this.$parent.$emit('cv:mounted', this);
-  },
-  updated() {
-    this.dataExpandable = !!this.$slots.expandedContent;
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:beforeDestroy', this);
   },
   computed: {
     expandable() {
@@ -102,6 +95,24 @@ export default {
     value() {
       return this.$refs.row.value;
     },
+  },
+  watch: {
+    expanded() {
+      if (this.dataExpanded !== this.expaned) {
+        this.dataExpanded = this.expanded;
+      }
+    },
+  },
+  mounted() {
+    // NOTE: this.$slots is not reactive so needs to be managed on updated
+    this.dataExpandable = !!this.$slots.expandedContent;
+    this.$parent.$emit('cv:mounted', this);
+  },
+  updated() {
+    this.dataExpandable = !!this.$slots.expandedContent;
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:beforeDestroy', this);
   },
   methods: {
     onExpandedChange(val) {

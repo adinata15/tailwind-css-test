@@ -1,9 +1,9 @@
 <template>
   <component
     :is="tagType"
-    v-on="$listeners"
     v-bind="linkProps"
     :class="`cv-skip-to-content ${carbonPrefix}--skip-to-content`"
+    v-on="$listeners"
   >
     <slot>Skip to main content</slot>
   </component>

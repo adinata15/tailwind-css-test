@@ -1,8 +1,17 @@
 <template>
-  <button class="cv-button" :class="buttonClassOpts()" v-on="inputListeners" role="button">
+  <button
+    class="cv-button"
+    :class="buttonClassOpts()"
+    role="button"
+    v-on="inputListeners"
+  >
     <slot></slot>
 
-    <CvSvg v-if="icon || iconHref" :svg="icon || iconHref" :class="`${carbonPrefix}--btn__icon`" />
+    <CvSvg
+      v-if="icon || iconHref"
+      :svg="icon || iconHref"
+      :class="`${carbonPrefix}--btn__icon`"
+    />
   </button>
 </template>
 
@@ -13,7 +22,7 @@ import CvSvg from '../cv-svg/_cv-svg';
 
 export default {
   name: 'CvButton',
-  mixins: [buttonMixin, carbonPrefixMixin],
   components: { CvSvg },
+  mixins: [buttonMixin, carbonPrefixMixin],
 };
 </script>

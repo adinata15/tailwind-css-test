@@ -1,6 +1,13 @@
 <template>
-  <component :is="tagType" v-on="$listeners" v-bind="linkProps" :class="`cv-header-name ${carbonPrefix}--header__name`">
-    <span v-if="prefix" :class="`${carbonPrefix}--header__name--prefix`">{{ prefix }}&nbsp;</span>
+  <component
+    :is="tagType"
+    v-bind="linkProps"
+    :class="`cv-header-name ${carbonPrefix}--header__name`"
+    v-on="$listeners"
+  >
+    <span v-if="prefix" :class="`${carbonPrefix}--header__name--prefix`"
+      >{{ prefix }}&nbsp;</span
+    >
     <slot />
   </component>
 </template>

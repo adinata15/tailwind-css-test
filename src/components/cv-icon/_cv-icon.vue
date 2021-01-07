@@ -1,7 +1,7 @@
 <template>
   <svg class="cv-icon">
     <title v-if="title">{{ title }}</title>
-    <use v-bind:xlink:href="iconHref" />
+    <use :xlink:href="iconHref" />
   </svg>
 </template>
 

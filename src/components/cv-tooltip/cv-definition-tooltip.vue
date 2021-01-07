@@ -1,5 +1,8 @@
 <template>
-  <div :class="`cv-definition-tooltip ${carbonPrefix}--tooltip--definition ${carbonPrefix}--tooltip--a11y`" :id="uid">
+  <div
+    :id="uid"
+    :class="`cv-definition-tooltip ${carbonPrefix}--tooltip--definition ${carbonPrefix}--tooltip--a11y`"
+  >
     <button
       :aria-describedby="`${uid}-label`"
       :class="[
@@ -13,7 +16,13 @@
     >
       {{ term }}
     </button>
-    <div :class="`${carbonPrefix}--assistive-text`" :id="`${uid}-label`" role="tooltip">{{ definition }}</div>
+    <div
+      :id="`${uid}-label`"
+      :class="`${carbonPrefix}--assistive-text`"
+      role="tooltip"
+    >
+      {{ definition }}
+    </div>
   </div>
 </template>
 
@@ -24,7 +33,11 @@ export default {
   name: 'CvDefinitionTooltip',
   mixins: [uidMixin, carbonPrefixMixin],
   props: {
-    alignment: { type: String, default: 'center', validator: val => ['start', 'center', 'end'].includes(val) },
+    alignment: {
+      type: String,
+      default: 'center',
+      validator: (val) => ['start', 'center', 'end'].includes(val),
+    },
     definition: { type: String, required: true },
     direction: {
       type: String,
@@ -33,7 +46,9 @@ export default {
         const validValues = ['top', 'left', 'right', 'bottom'];
         const valid = validValues.includes(val);
         if (!valid) {
-          console.warn(`CVDefinitionTooltip.direction must be one of the following: ${validValues}`);
+          console.warn(
+            `CVDefinitionTooltip.direction must be one of the following: ${validValues}`
+          );
         }
         return valid;
       },

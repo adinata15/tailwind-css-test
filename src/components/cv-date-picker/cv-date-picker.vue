@@ -1,6 +1,12 @@
 <template>
-  <cv-wrapper :tag-type="formItem ? 'div' : ''" :class="`cv-date-picker ${carbonPrefix}--form-item`" :id="uid">
+  <cv-wrapper
+    :id="uid"
+    :tag-type="formItem ? 'div' : ''"
+    :class="`cv-date-picker ${carbonPrefix}--form-item`"
+  >
     <div
+      :id="formItem ? undefined : uid"
+      ref="date-picker"
       :data-date-picker="['single', 'range'].includes(kind)"
       :data-date-picker-type="kind"
       :class="[
@@ -11,30 +17,35 @@
           'cv-date-pciker': !formItem,
         },
       ]"
-      ref="date-picker"
-      :id="formItem ? undefined : uid"
     >
       <div
         :class="{
-          [`${carbonPrefix}--date-picker-container`]: ['single', 'range'].includes(kind),
+          [`${carbonPrefix}--date-picker-container`]: [
+            'single',
+            'range',
+          ].includes(kind),
           [`${carbonPrefix}--date-picker--nolabel`]: getDateLabel !== undefined,
         }"
         @change="onChange"
       >
-        <label v-if="getDateLabel.length > 0" :for="`${uid}-input-1`" :class="`${carbonPrefix}--label`">
+        <label
+          v-if="getDateLabel.length > 0"
+          :for="`${uid}-input-1`"
+          :class="`${carbonPrefix}--label`"
+        >
           {{ getDateLabel }}
         </label>
         <div :class="`${carbonPrefix}--date-picker-input__wrapper`">
           <input
+            :id="`${uid}-input-1`"
+            ref="date"
             :data-invalid="isInvalid"
             type="text"
-            :id="`${uid}-input-1`"
             :class="`${carbonPrefix}--date-picker__input`"
             :pattern="pattern"
             :placeholder="placeholder"
             data-date-picker-input
             :data-date-picker-input-from="kind === 'range'"
-            ref="date"
           />
           <Calendar16
             v-if="['single', 'range'].includes(kind)"
@@ -43,26 +54,41 @@
             @click="cal.open()"
           />
         </div>
-        <div :class="`${carbonPrefix}--form-requirement`" v-if="isInvalid">
-          <slot name="invalid-message">{{ invalidMessage || invalidDateMessage }}</slot>
+        <div v-if="isInvalid" :class="`${carbonPrefix}--form-requirement`">
+          <slot name="invalid-message">{{
+            invalidMessage || invalidDateMessage
+          }}</slot>
         </div>
       </div>
-      <div :class="{ [`${carbonPrefix}--date-picker-container`]: kind === 'range' }" v-if="kind === 'range'">
-        <label v-if="getDateEndLabel.length > 0" :for="`${uid}-input-2`" :class="`${carbonPrefix}--label`">
+      <div
+        v-if="kind === 'range'"
+        :class="{
+          [`${carbonPrefix}--date-picker-container`]: kind === 'range',
+        }"
+      >
+        <label
+          v-if="getDateEndLabel.length > 0"
+          :for="`${uid}-input-2`"
+          :class="`${carbonPrefix}--label`"
+        >
           {{ getDateEndLabel }}
         </label>
         <div :class="`${carbonPrefix}--date-picker-input__wrapper`">
           <input
-            type="text"
             :id="`${uid}-input-2`"
+            ref="todate"
+            type="text"
             :class="`${carbonPrefix}--date-picker__input`"
             :pattern="pattern"
             :placeholder="placeholder"
             data-date-picker-input
             :data-date-picker-input-to="kind === 'range'"
-            ref="todate"
           />
-          <Calendar16 :class="`${carbonPrefix}--date-picker__icon`" data-date-picker-icon @click="openTodateCal()" />
+          <Calendar16
+            :class="`${carbonPrefix}--date-picker__icon`"
+            data-date-picker-icon
+            @click="openTodateCal()"
+          />
         </div>
       </div>
     </div>
@@ -93,8 +119,12 @@ l10n.en.weekdays.shorthand.forEach((day, index) => {
 
 export default {
   name: 'CvDatePicker',
-  mixins: [uidMixin, themeMixin, carbonPrefixMixin],
   components: { Calendar16, CvWrapper },
+  mixins: [uidMixin, themeMixin, carbonPrefixMixin],
+  model: {
+    prop: 'value',
+    event: 'change',
+  },
   props: {
     dateLabel: { type: String, default: undefined },
     dateEndLabel: { type: String, default: undefined },
@@ -102,7 +132,7 @@ export default {
     kind: {
       type: String,
       default: 'simple',
-      validator: val => ['short', 'simple', 'single', 'range'].includes(val),
+      validator: (val) => ['short', 'simple', 'single', 'range'].includes(val),
     },
     calOptions: {
       type: Object,
@@ -119,7 +149,9 @@ export default {
       default: undefined,
       validator(val) {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('CvDatePicker: invalid prop deprecated in favour of invalidMessage');
+          console.warn(
+            'CvDatePicker: invalid prop deprecated in favour of invalidMessage'
+          );
         }
         return true;
       },
@@ -129,7 +161,9 @@ export default {
       default: undefined,
       validator(val) {
         if (val !== undefined && process.env.NODE_ENV === 'development') {
-          console.warn('CvDatePicker: invalidDateMessage deprecated in favour of invalidMessage');
+          console.warn(
+            'CvDatePicker: invalidDateMessage deprecated in favour of invalidMessage'
+          );
         }
         return true;
       },
@@ -137,37 +171,12 @@ export default {
     invalidMessage: { type: String, default: undefined },
     value: [String, Object, Array, Date],
   },
-  model: {
-    prop: 'value',
-    event: 'change',
-  },
   data() {
     return {
       dataValue: this.value,
       dataOptions: {},
       isInvalid: false,
     };
-  },
-  watch: {
-    value() {
-      if (this.isSingle) {
-        this.cal.setDate(this.value, true);
-      } else if (this.isRange) {
-        this.cal.setDate([this.value.startDate, this.value.endDate], true);
-      } else {
-        this.$refs.date.value = this.value;
-      }
-      this.dataValue = this.value;
-    },
-    calOptions() {
-      this.initFlatpickr();
-    },
-    kind() {
-      this.initFlatpickr();
-    },
-    invalidMessage() {
-      this.checkSlots();
-    },
   },
   computed: {
     getDateLabel() {
@@ -199,6 +208,46 @@ export default {
       return this.kind === 'single';
     },
   },
+  watch: {
+    value() {
+      if (this.isSingle) {
+        this.cal.setDate(this.value, true);
+      } else if (this.isRange) {
+        this.cal.setDate([this.value.startDate, this.value.endDate], true);
+      } else {
+        this.$refs.date.value = this.value;
+      }
+      this.dataValue = this.value;
+    },
+    calOptions() {
+      this.initFlatpickr();
+    },
+    kind() {
+      this.initFlatpickr();
+    },
+    invalidMessage() {
+      this.checkSlots();
+    },
+  },
+  mounted() {
+    this.initFlatpickr();
+    this.checkSlots();
+    // this.cal.setDate([Date.now(), Date.now()]);
+    // setTimeout(() => {
+    //   let curDate = new Date();
+    //   let anotherDate = new Date();
+    //   anotherDate = anotherDate.setDate(anotherDate.getDate() + 16);
+    //   this.cal.setDate([curDate, anotherDate], true);
+    // }, 2000);
+  },
+  updated() {
+    this.checkSlots();
+  },
+  beforeDestroy() {
+    if (this.cal) {
+      this.cal.destroy();
+    }
+  },
   methods: {
     checkSlots() {
       // NOTE: this.$slots is not reactive so needs to be managed on updated
@@ -225,7 +274,10 @@ export default {
       // prefer value if set
       if (this.dataValue) {
         if (this.isRange) {
-          _options.defaultDate = [this.dataValue.startDate, this.dataValue.endDate];
+          _options.defaultDate = [
+            this.dataValue.startDate,
+            this.dataValue.endDate,
+          ];
         } else {
           _options.defaultDate = this.dataValue;
         }
@@ -235,8 +287,8 @@ export default {
       _options.plugins = [
         this.isRange
           ? new carbonFlatpickrRangePlugin({
-              input: this.$refs.todate,
-            })
+            input: this.$refs.todate,
+          })
           : () => {},
         carbonFlatpickrMonthSelectPlugin({
           selectorFlatpickrMonthYearContainer: '.flatpickr-current-month',
@@ -263,8 +315,9 @@ export default {
       return _options;
     },
     onChange() {
-      let firstDate, secondDate;
-      let dateToString = val => {
+      let firstDate;
+      let secondDate;
+      const dateToString = (val) => {
         if (typeof val === 'number') {
           return this.cal.formatDate(val, this.calOptions.dateFormat);
         } else {
@@ -282,7 +335,10 @@ export default {
       }
 
       if (this.isRange) {
-        if (firstDate !== this.$refs.date.value || secondDate !== this.$refs.todate.value) {
+        if (
+          firstDate !== this.$refs.date.value ||
+          secondDate !== this.$refs.todate.value
+        ) {
           this.dataValue = {
             startDate: this.$refs.date.value,
             endDate: this.$refs.todate.value,
@@ -294,8 +350,13 @@ export default {
           this.dataValue = this.$refs.date.value;
           this.$emit('change', this.dataValue);
 
-          if (this.$listeners['simpleChange'] && process.env.NODE_ENV === 'development') {
-            console.warn('CvDatePicker: simple change event deprecated in favour of change.');
+          if (
+            this.$listeners['simpleChange'] &&
+            process.env.NODE_ENV === 'development'
+          ) {
+            console.warn(
+              'CvDatePicker: simple change event deprecated in favour of change.'
+            );
             this.$emit('simpleChange', this.dataValue);
           }
         }
@@ -316,19 +377,32 @@ export default {
 
       if (calendarContainer) {
         calendarContainer.classList.add(options.classCalendarContainer);
-        calendarContainer.querySelector('.flatpickr-month').classList.add(options.classMonth);
-        calendarContainer.querySelector('.flatpickr-weekdays').classList.add(options.classWeekdays);
-        calendarContainer.querySelector('.flatpickr-days').classList.add(options.classDays);
-        for (const item of calendarContainer.querySelectorAll('.flatpickr-weekday')) {
+        calendarContainer
+          .querySelector('.flatpickr-month')
+          .classList.add(options.classMonth);
+        calendarContainer
+          .querySelector('.flatpickr-weekdays')
+          .classList.add(options.classWeekdays);
+        calendarContainer
+          .querySelector('.flatpickr-days')
+          .classList.add(options.classDays);
+        for (const item of calendarContainer.querySelectorAll(
+          '.flatpickr-weekday'
+        )) {
           const currentItem = item;
           currentItem.innerHTML = currentItem.innerHTML.replace(/\s+/g, '');
           currentItem.classList.add(options.classWeekday);
         }
-        for (const item of calendarContainer.querySelectorAll('.flatpickr-day')) {
+        for (const item of calendarContainer.querySelectorAll(
+          '.flatpickr-day'
+        )) {
           item.classList.add(options.classDay);
           if (item.classList.contains('today') && selectedDates.length > 0) {
             item.classList.add('no-border');
-          } else if (item.classList.contains('today') && selectedDates.length === 0) {
+          } else if (
+            item.classList.contains('today') &&
+            selectedDates.length === 0
+          ) {
             item.classList.remove('no-border');
           }
         }
@@ -337,25 +411,6 @@ export default {
     openTodateCal() {
       this.$refs.todate.click();
     },
-  },
-  mounted() {
-    this.initFlatpickr();
-    this.checkSlots();
-    // this.cal.setDate([Date.now(), Date.now()]);
-    // setTimeout(() => {
-    //   let curDate = new Date();
-    //   let anotherDate = new Date();
-    //   anotherDate = anotherDate.setDate(anotherDate.getDate() + 16);
-    //   this.cal.setDate([curDate, anotherDate], true);
-    // }, 2000);
-  },
-  updated() {
-    this.checkSlots();
-  },
-  beforeDestroy() {
-    if (this.cal) {
-      this.cal.destroy();
-    }
   },
 };
 </script>

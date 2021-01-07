@@ -19,10 +19,10 @@
     ]"
   >
     <a
+      ref="link"
       :aria-checked="internalSelected"
       :class="`${carbonPrefix}--dropdown-link`"
       href="javascript:void(0)"
-      ref="link"
       role="menuitemradio"
       tabindex="-1"
     >
@@ -43,28 +43,17 @@ export default {
     },
     selected: Boolean,
   },
-  watch: {
-    selected() {
-      this.dataSelected = this.selected;
-      this.$parent.$emit('cv:selected', this);
-    },
-  },
   data() {
     return {
       dataSelected: undefined,
     };
   },
-  mounted() {
-    this.$_CvDropdownItem = true; // for use by parent with $children
-    this.$parent.$emit('cv:mounted', this);
-  },
-  beforeDestroy() {
-    this.$parent.$emit('cv:beforeDestroy', this);
-  },
   computed: {
     internalSelected: {
       get() {
-        return this.dataSelected === undefined ? this.selected : this.dataSelected === true;
+        return this.dataSelected === undefined
+          ? this.selected
+          : this.dataSelected === true;
       },
       set(val) {
         this.dataSelected = val;
@@ -73,6 +62,19 @@ export default {
     internalContent() {
       return this.$refs.link.innerHTML;
     },
+  },
+  watch: {
+    selected() {
+      this.dataSelected = this.selected;
+      this.$parent.$emit('cv:selected', this);
+    },
+  },
+  mounted() {
+    this.$_CvDropdownItem = true; // for use by parent with $children
+    this.$parent.$emit('cv:mounted', this);
+  },
+  beforeDestroy() {
+    this.$parent.$emit('cv:beforeDestroy', this);
   },
   methods: {
     setFocus() {

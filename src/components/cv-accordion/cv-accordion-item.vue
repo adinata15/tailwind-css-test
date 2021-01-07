@@ -21,8 +21,8 @@
     @animationend="onAnimationEnd"
   >
     <button
-      :disabled="disabled"
       ref="button"
+      :disabled="disabled"
       type="button"
       :class="`${carbonPrefix}--accordion__heading`"
       :aria-expanded="dataOpen ? 'true' : 'false'"
@@ -45,11 +45,21 @@ import ChevronRight16 from '@carbon/icons-vue/es/chevron--right/16';
 import { uidMixin, carbonPrefixMixin, methodsMixin } from '../../mixins';
 export default {
   name: 'CvAccordionItem',
-  mixins: [uidMixin, carbonPrefixMixin, methodsMixin({ button: ['blur', 'focus'] })],
+  mixins: [
+    uidMixin,
+    carbonPrefixMixin,
+    methodsMixin({ button: ['blur', 'focus'] }),
+  ],
   components: { ChevronRight16 },
   props: {
     disabled: Boolean,
     open: { type: Boolean, default: false },
+  },
+  data() {
+    return {
+      animation: '',
+      dataOpen: false,
+    };
   },
   watch: {
     open: {
@@ -58,12 +68,6 @@ export default {
         this.dataOpen = value;
       },
     },
-  },
-  data() {
-    return {
-      animation: '',
-      dataOpen: false,
-    };
   },
   mounted() {
     this.$_CvAccordionItem = true; // for use by parent with $children

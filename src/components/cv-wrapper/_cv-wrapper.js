@@ -20,7 +20,9 @@ export default {
         context.props.tagType,
         {
           attrs: context.data.attrs,
-          class: `${context.data.class || ''} ${context.data.staticClass || ''}`.trim(),
+          class: `${context.data.class || ''} ${
+            context.data.staticClass || ''
+          }`.trim(),
           style: { ...context.data.staticStyle, ...context.data.style },
           on: context.listeners,
         },
