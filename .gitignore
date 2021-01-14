@@ -23,6 +23,5 @@ pnpm-debug.log*
 *.sw?
 
 # Items from outside
-src/styles/components
 src/styles/globals
 src/components

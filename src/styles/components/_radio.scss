@@ -1,0 +1,22 @@
+// Radio button
+.radio {
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--horizontal {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+.radio-button {
+  &--primary {
+    color: $primary-color;
+  }
+
+  &--secondary {
+    color: $secondary-color;
+  }
+}

@@ -1,0 +1,1 @@
+This folder ontains all of your components. This folder will make up the vast majority of your compiled CSS. All custom components simply live inside this folder, for example '/components/component/\_component.scss'.

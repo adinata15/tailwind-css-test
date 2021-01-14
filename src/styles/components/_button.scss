@@ -1,0 +1,58 @@
+// Button
+.button {
+  &__icon {
+    overflow: hidden;
+    margin: 0.2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &--sm {
+    margin: 0.7rem 1.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  &--md {
+    margin: 0.7rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+  }
+
+  &--lg {
+    margin: 0.7rem 1.5rem;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  &--xl {
+    margin: 0.7rem 1.5rem;
+    font-size: 1.5rem;
+    border-radius: 1.25rem;
+  }
+
+  &--primary {
+    display: flex;
+    background-color: $primary-color;
+    color: white;
+  }
+
+  &--secondary {
+    display: flex;
+    background-color: $secondary-color;
+    color: white;
+  }
+
+  &--ghost {
+    display: flex;
+    background-color: $ghost-color;
+    border: 0.125rem solid $primary-color;
+    color: black;
+  }
+
+  &--danger {
+    display: flex;
+    background-color: $alert-color;
+    color: white;
+  }
+}
