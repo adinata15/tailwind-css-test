@@ -1,0 +1,49 @@
+// Text area
+.textarea {
+  font-size: 80%;
+
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--horizontal {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &--primary {
+    color: $primary-color;
+  }
+
+  &--secondary {
+    color: $secondary-color;
+  }
+}
+.textarea-input {
+  &__icon {
+    overflow: hidden;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &--sm {
+    margin: 0.7rem 1.5rem;
+    width: 10rem;
+  }
+
+  &--md {
+    margin: 0.7rem 1.5rem;
+    width: 15rem;
+  }
+
+  &--lg {
+    margin: 0.7rem 1.5rem;
+    width: 20rem;
+  }
+
+  &--xl {
+    margin: 0.7rem 1.5rem;
+    width: 25rem;
+  }
+}

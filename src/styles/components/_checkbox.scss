@@ -1,0 +1,22 @@
+// Checkbox button
+.checkbox {
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--horizontal {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+.checkbox-button {
+  &--primary {
+    color: $primary-color;
+  }
+
+  &--secondary {
+    color: $secondary-color;
+  }
+}
